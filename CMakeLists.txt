@@ -3,8 +3,8 @@ project(camera_is1500)
 
 ## Use C++11
 #add_definitions(--std=c++11)
-set(__GLIBCXX_USE_CXX11_ABI=0)
-set(CMAKE_CXX_COMPILER "g++-4.8")
+set(__GLIBCXX_USE_CXX11_ABI=0) #added and used in the makefile of the sfmain
+set(CMAKE_CXX_COMPILER "g++-4.8") #compile using g++-4.8 as asked by Thales
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
@@ -49,8 +49,11 @@ include_directories(
 )
 
 ## Declare a C++ executable
+# Example : add_executable(your_node ${${PROJECT_NAME}_SOURCES})
+
 add_executable(talker src/camera_is1500_node.cpp)
-#add_executable(your_node ${${PROJECT_NAME}_SOURCES})
+
+
 ## Specify libraries to link a library or executable target against
 target_link_libraries(talker
   ${catkin_LIBRARIES}
