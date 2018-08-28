@@ -14,6 +14,17 @@
 #include <string>
 #include "std_msgs/String.h"
 
+// from the sfStudio
+#ifdef WIN32
+#include "windows.h"
+#endif
+#include <iostream>
+#include <iomanip>
+#include <signal.h>
+#include <unistd.h>
+#include "libsfaccess.h"
+
+using namespace std;
 
 int main(int argc, char **argv)
 {
