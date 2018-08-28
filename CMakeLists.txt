@@ -45,7 +45,7 @@ catkin_package()
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  #lib
+  lib
 )
 
 ## Declare a C++ executable
@@ -57,7 +57,8 @@ add_executable(talker src/camera_is1500_node.cpp)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(talker
   ${catkin_LIBRARIES}
-  #/home/jonathan/ros_catkin_kyb/camera_is1500/lib/libsfaccess.so
+  # ../lib/libsfaccess.so
+  #libsfaccess
   )
 
 #install(TARGETS talker
