@@ -26,6 +26,31 @@
 
 using namespace std;
 
+// add the second part
+// Return status;
+#define ERR 0
+#define OK 1
+
+// Sleep specified number of ms
+#ifdef WIN32
+#define SNOOZE_MS(ms) Sleep(ms)
+#else // Linux
+#define SNOOZE_MS(ms) usleep((ms) * 1000)
+#endif
+
+// Convert radians to degrees
+#define RAD2DEG(rad) ((rad) * 180.0 / 3.1415927)
+
+// Stop program?
+static bool stop = false;
+
+// Signal handler for ctrl-c
+void sigHandler(int sig)
+{
+    cout << endl << "Stop signal received" << endl;
+    stop = true;
+}
+
 int main(int argc, char **argv)
 {
   // ros::init(argc, argv, "interface_sf_ros_node");
