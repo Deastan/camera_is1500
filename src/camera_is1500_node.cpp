@@ -29,7 +29,7 @@ int main(int argc, char **argv)
   while (ros::ok())
   {
     std::cout << "hello world " << count;
-
+    // test if all work
     ROS_INFO("Salut c'est Joli!");
     //chatter_pub.publish(msg);
     ros::spinOnce();
