@@ -15,19 +15,19 @@
 #include <sensor_msgs/PointCloud.h>
 
 // include library
-// #include "interface.h"
+#include "interface.h"
 
 // test for memory:
 // #include <cstdint>
 // #include <sstream>
-#include "libsfaccess.h"
+// #include "libsfaccess.h"
 
-#include "std_msgs/Int16.h"
-#include "sensor_msgs/JointState.h"
-// #include "isense.h"
-#ifdef UNIX
-#include <unistd.h>
-#endif
+// #include "std_msgs/Int16.h"
+// #include "sensor_msgs/JointState.h"
+// // #include "isense.h"
+// #ifdef UNIX
+// #include <unistd.h>
+// #endif
 
 // Convert radians to degrees
 #define RAD2DEG(rad) ((rad) * 180.0 / 3.1415927)
@@ -109,37 +109,47 @@ int main(int argc, char **argv)
 
   ros::Rate loop_rate(10);
   SfAccess sfa;
-  sfa.open();
+  // sfa.setIniPath("/home/jonathan/Documents/Kyburz/IS-1500_2017d/Camera/Linux/SDKs/sfAccessSDK/SampleCode");
+  // sfa.setStreaming(true);
+  // std::cout << "Screen what I want : "<< sfa.getStreaming() << std::endl;
+  // Read sfaccess.ini file and open tracker interface
+  if (!sfa.open())
+  {
+      std::cout << "Error: Failed to open - Whhaat ? "  << std::endl;
+      return 0;
+  }
+
+  // sfa.open();
   std::vector<float> v;
   while(nh.ok())
   {
-    SfAccess::TrkData trkData;
-    bool trkValid = false;
-    sfa.getTrackingDataLatest(&trkValid, &trkData);
+    // SfAccess::TrkData trkData;
+    // bool trkValid = false;
+    // sfa.getTrackingDataLatest(&trkValid, &trkData);
 
     // v is a table of float with the data of the IMU of the camera
     // organised as roll  pitch    yaw   posx   posy   posz
-    std::vector<float> v;
+    // std::vector<float> v;
     // std::cout << "interface.cpp : " << RAD2DEG(trkData.trkRot[0]) << " "
     // << RAD2DEG(trkData.trkRot[1]) << " "
     // << RAD2DEG(trkData.trkRot[2]) << " "
     // << trkData.trkPos[0] << " "
     // << trkData.trkPos[1] << " "
     // << trkData.trkPos[2] << std::endl;
-    v.push_back(RAD2DEG(trkData.trkRot[0]));
-    v.push_back(RAD2DEG(trkData.trkRot[1]));
-    v.push_back(RAD2DEG(trkData.trkRot[2]));
-    v.push_back(trkData.trkPos[0]);
-    v.push_back(trkData.trkPos[1]);
-    v.push_back(trkData.trkPos[2]);
-    std::cout << "interface.cpp5 : " << v[0] << " " << v[1] << " " << v[2] << " "
-      << v[3] << " " << v[4] << " " << v[5] << std::endl;
+    // v.push_back(RAD2DEG(trkData.trkRot[0]));
+    // v.push_back(RAD2DEG(trkData.trkRot[1]));
+    // v.push_back(RAD2DEG(trkData.trkRot[2]));
+    // v.push_back(trkData.trkPos[0]);
+    // v.push_back(trkData.trkPos[1]);
+    // v.push_back(trkData.trkPos[2]);
+    // std::cout << "interface.cpp : " << v[0] << " " << v[1] << " " << v[2] << " "
+    //   << v[3] << " " << v[4] << " " << v[5] << std::endl;
     // overInit();
     // v is a table of float with the data of the IMU of the camera
     // organised as roll   pitch    yaw   posx   posy   posz
-    // v = overGetData();
-    // std::cout << v[0] << " " << v[1] << " " << v[2] << " "
-    // << v[3] << " " << v[4] << " " << v[5] << std::endl;
+    v = overGetData();
+    std::cout << v[0] << " " << v[1] << " " << v[2] << " "
+    << v[3] << " " << v[4] << " " << v[5] << std::endl;
 
     //init. message as a PointCloud and publish it
     sensor_msgs::PointCloud cloud;
