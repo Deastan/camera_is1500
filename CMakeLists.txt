@@ -2,13 +2,14 @@ cmake_minimum_required(VERSION 2.8.3)
 project(camera_is1500)
 
 ## Use C++11
-add_definitions(--std=c++11)
+#add_definitions(--std=c++11)
 #set(__GLIBCXX_USE_CXX11_ABI=0) #added and used in the makefile of the sfmain
 #set(CMAKE_CXX_COMPILER "g++-4.8") #compile using g++-4.8 as asked by Thales
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  rospy
   sensor_msgs
   std_msgs
 )
