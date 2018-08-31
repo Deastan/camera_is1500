@@ -30,17 +30,18 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "interface_sf_ros_node");
 
 
-  SfAccess sfa;
-  sfa.open();
+
   // init. publisher
   ros::NodeHandle nh;
-  ros::Publisher track_pub = nh.advertise<sensor_msgs::PointCloud>("track_camera", 50);
+  ros::Publisher track_pub = nh.advertise<sensor_msgs::PointCloud>("track_camera", 1000);
   // declaration of the variables
-  std::vector<float> v;
+
   // overInit();
 
-  ros::Rate r(40);
-
+  ros::Rate loop_rate(10);
+  SfAccess sfa;
+  sfa.open();
+  std::vector<float> v;
   while(nh.ok())
   {
     SfAccess::TrkData trkData;
@@ -50,19 +51,19 @@ int main(int argc, char **argv)
     // v is a table of float with the data of the IMU of the camera
     // organised as roll  pitch    yaw   posx   posy   posz
     std::vector<float> v;
-    std::cout << "interface.cpp : " << RAD2DEG(trkData.trkRot[0]) << " "
-    << RAD2DEG(trkData.trkRot[1]) << " "
-    << RAD2DEG(trkData.trkRot[2]) << " "
-    << trkData.trkPos[0] << " "
-    << trkData.trkPos[1] << " "
-    << trkData.trkPos[2] << std::endl;
+    // std::cout << "interface.cpp : " << RAD2DEG(trkData.trkRot[0]) << " "
+    // << RAD2DEG(trkData.trkRot[1]) << " "
+    // << RAD2DEG(trkData.trkRot[2]) << " "
+    // << trkData.trkPos[0] << " "
+    // << trkData.trkPos[1] << " "
+    // << trkData.trkPos[2] << std::endl;
     v.push_back(RAD2DEG(trkData.trkRot[0]));
     v.push_back(RAD2DEG(trkData.trkRot[1]));
     v.push_back(RAD2DEG(trkData.trkRot[2]));
     v.push_back(trkData.trkPos[0]);
     v.push_back(trkData.trkPos[1]);
     v.push_back(trkData.trkPos[2]);
-    std::cout << "interface.cpp : " << v[0] << " " << v[1] << " " << v[2] << " "
+    std::cout << "interface.cpp5 : " << v[0] << " " << v[1] << " " << v[2] << " "
       << v[3] << " " << v[4] << " " << v[5] << std::endl;
     // overInit();
     // v is a table of float with the data of the IMU of the camera
@@ -110,8 +111,8 @@ int main(int argc, char **argv)
     // std::cout << "the int at address " << p6 << " is " << *p6 << '\n';
     // std::cout << "****************end******************" << '\n';
 
-
-    r.sleep();
+    ros::spinOnce();
+    loop_rate.sleep();
   } // end loop
 
   return 0;
