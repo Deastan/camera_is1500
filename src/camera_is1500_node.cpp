@@ -38,29 +38,27 @@ int main(int argc, char **argv)
 
   while(nh.ok())
   {
+    // v is a table of float with the data of the IMU of the camera
+    // organised as roll   pitch    yaw   posx   posy   posz
     v = overGetData();
     std::cout << v[0] << " " << v[1] << " " << v[2] << " "
     << v[3] << " " << v[4] << " " << v[5] << std::endl;
 
+    //init. message as a PointCloud and publish it
     sensor_msgs::PointCloud cloud;
 
     cloud.header.stamp = ros::Time::now();
     cloud.header.frame_id = "camera_is1500";
 
-    cloud.points.resize(1);
+    cloud.points.resize(2);
+    // organised as roll  pitch yaw
     cloud.points[0].x = 5;//v[0];
-    cloud.points[0].y = 4;//v[1];
-    cloud.points[0].z = 3;//v[2];
-
-    // cloud.channels.resize(1);
-    // cloud.channels[0].name = "intensities";
-    // cloud.channels[0].values.resize(num_points);
-    // for(unsigned int j = 0; j < num_points; ++j){
-    //   cloud.points[j].x = ranges[j]*cos(angles[j]);
-    //   cloud.points[j].y = ranges[j]*sin(angles[j]);
-    //   cloud.points[j].z = 0; //to be handled by the laser transform frame
-    //   cloud.channels[0].values[j] = 100;
-    // } // end loop
+    cloud.points[0].y = 5;//v[1];
+    cloud.points[0].z = 5;//v[2];
+    // organised as posx  posy posz
+    cloud.points[1].x = 4;//v[3];
+    cloud.points[1].y = 4;//v[4];
+    cloud.points[1].z = 4;//v[5];
 
     track_pub.publish(cloud);
     r.sleep();
