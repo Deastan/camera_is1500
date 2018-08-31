@@ -22,11 +22,80 @@
 // #include <sstream>
 #include "libsfaccess.h"
 
+#include "std_msgs/Int16.h"
+#include "sensor_msgs/JointState.h"
+// #include "isense.h"
+#ifdef UNIX
+#include <unistd.h>
+#endif
+
 // Convert radians to degrees
 #define RAD2DEG(rad) ((rad) * 180.0 / 3.1415927)
 
 int main(int argc, char **argv)
 {
+//
+//   ros::init(argc, argv, "talker");
+//
+//   ros::NodeHandle n;
+//
+//   ros::Publisher chatter_pub = n.advertise<std_msgs::Int16>("head_yaw", 1000);
+//   ros::Publisher chatter_pub_2 = n.advertise<std_msgs::Int16>("head_accel", 1000);
+//
+//   ros::Rate loop_rate(10);
+//
+//   ISD_TRACKER_HANDLE       handle;
+//   ISD_TRACKER_INFO_TYPE    tracker;
+//   ISD_TRACKING_DATA_TYPE   data;
+//
+//   handle = ISD_OpenTracker((Hwnd)NULL, 0, FALSE, FALSE );
+//
+//   ISD_ResetHeading(handle, 1);
+//
+//   if ( handle > 0 )
+//     printf( "\n    Az    El    Rl    X    Y    Z \n" );
+//   else
+//     printf( "Tracker not found. Press any key to exit" );
+//
+//   int count = 0;
+//   int yaw = 0;
+//   int pitch = 0;
+//   double yaw_cmd = 0;
+//   long counter = 0;
+//   while (ros::ok())
+//   {
+//     counter = counter + 1;
+//
+//     ISD_GetTrackingData( handle, &data );
+//     printf( "%7.2f \n", data.Station[0].AngularVelNavFrame[2]);
+//     yaw = (data.Station[0].Euler[0]);
+//     yaw_cmd = (float)(yaw) / (float)(60);
+//     pitch = data.Station[0].AngularVelNavFrame[2];
+//     ISD_GetCommInfo( handle, &tracker );
+//
+//     std_msgs::Int16 msg;
+//     std_msgs::Int16 msg2;
+//     sensor_msgs::JointState head_track_msg;
+//
+//     msg.data = yaw;
+//     msg2.data = pitch;
+//
+//
+//
+//
+//     chatter_pub.publish(msg);
+//     chatter_pub_2.publish(msg2);
+//
+//
+//
+//     ros::spinOnce();
+//     loop_rate.sleep();
+//     ++count;
+//   }
+
+
+
+
   ros::init(argc, argv, "interface_sf_ros_node");
 
 

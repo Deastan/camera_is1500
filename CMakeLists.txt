@@ -64,6 +64,7 @@ target_link_libraries(talker
   #lib/libsfaccess.so
   #lib/libinterface.so
   ${CMAKE_CURRENT_LIST_DIR}/lib/libsfaccess.so
+  ${CMAKE_CURRENT_LIST_DIR}/lib/libisense.so
   )
 
 
