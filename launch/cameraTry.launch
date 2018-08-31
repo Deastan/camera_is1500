@@ -1,9 +1,10 @@
-<?xml version="1.0"?>
-
 <launch>
-    <node name="anyName" pkg="camera_is1500" type="talker"
-      output="screen">
+    <node name="anyName" pkg="camera_is1500" type="talker" output="screen">
     </node>
+    <!-- <node name="scriptSFHub" pkg="camera_is1500" type="script" output="screen">
+    </node> -->
+    <!-- <node name="script" pkg="camera_is1500" type="scriptSHub" output="screen">
+    </node> -->
 
     <!-- <node name="rViz" pkg="rviz" type= "rviz" output="screen"></node>-->
     <!-- <node name="node_manager" pkg="node_manager" type= "node_manager" output="screen"></node> -->
