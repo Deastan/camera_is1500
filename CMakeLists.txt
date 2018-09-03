@@ -55,11 +55,11 @@ include_directories(include/camera_is1500
 ## Declare a C++ executable
 # Example : add_executable(your_node ${${PROJECT_NAME}_SOURCES})
 
-add_executable(talker src/camera_is1500_node.cpp)
+add_executable(camera_is1500 src/camera_is1500_node.cpp)
 add_executable(script src/sfhub_node.cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(talker
+target_link_libraries(camera_is1500
   ${catkin_LIBRARIES}
   #lib/libsfaccess.so
   #lib/libinterface.so

@@ -1,0 +1,140 @@
+;==============================================================================
+; Section names are UpperCamelCase. Keys are lowerCamelCase.
+; Equal signs '=' are not allowed.
+; 
+; Settings contained in the 'Master' section can be overridden for a specific
+;   sensor by inserting S1-S4 sections and specifying a different value.
+; Settings NOT contained in the 'Master' section apply to all sensors
+; 
+; IP address syntax is ipaddr:port
+; Special 'ipaddr' values: * = 255.255.255.255, localhost = 127.0.0.1
+;==============================================================================
+Version 2.08
+
+;==============================================================================
+General
+{
+    appMode    1 ; (1) Tracking (2) Playback (3) Configuration Utility
+    numSensors 1 ; (1) Min (4) Max
+    verbosity  0 ; (0) Low (1) Med (2) High
+    
+    Master
+    {
+        ; (1) sfCore 3DOF
+        ; (2) sfCore 6DOF 
+        ; (3) NFT + Fid
+        ; (4) NFT + GPS
+        ; (5) NFT + GPS + Fid
+        trkMode 3
+
+        sensorType 2 ; (1) HObIT (2) InertiaCam
+        initState  1 ; (1) Streaming, (0) Paused
+        logData    0 ; (1) Enable data logging
+    }
+}
+
+;==============================================================================
+Communication
+{
+    Master
+    {
+        ; Serial port for sensor connection
+        ; Windows    - COMx
+        ; Linux      - /dev/ttyACMx
+        ; AutoDetect - auto
+        serialPort auto
+
+        imgTx     0              ; (1) Enable image transfer
+        imgTxMode 1              ; (1) Shared mem (2) UDP
+        tcpPort   51717          ; TCP port for communication with sfAccess
+        inputPort 9004           ; UDP port for input data from sfAccess
+        udpMeta   localhost:9001 ; Meta packet broadcast address
+        udpCore   localhost:9002 ; Core packet broadcast address
+        udpNft    localhost:9007 ; NFT packet broadcast address
+        udpImg    localhost:9003 ; Image packet broadcast address
+        udpNav    localhost:9005 ; NavCore packet broadcast address
+    }
+}
+
+;==============================================================================
+InertiaCam
+{
+    Master
+    {
+        ncDataDiv       5     ; NavChip data rate divisor (rate = 1000/divisor in Hz)
+        frameInterval   50000 ; Frame interval (microseconds). Must be multiple of NC data period.
+        manualExposure  3500  ; Initial manual exposure
+        autoExposure    1     ; (1) Enable (0) Disable
+        autoExposureMin 100   ; Microseconds.
+        autoExposureMax 15000 ; Microseconds.
+        autoExposureLum 1000  ; Auto exposure target luminosity
+        illuminator     0     ; IR illuminator enable
+    }
+}
+
+;==============================================================================
+ImgProc
+{
+    Master
+    {
+        whiteCenterEyes 1   ; (1) white center (0) black center
+        filterFidMod    100 ; Fiducial modulus
+        imProcDiv       1   ; Image processing divisor 
+        undistort       1   ; (1) Enable undistortion
+    }
+}
+
+;==============================================================================
+VINS
+{
+    Master
+    {
+        outImgType       0 ; (0) Raw (1) NFT diag
+        gpsAccuracy      3 ; GPS antenna accuracy (meters)
+        frontUpdate      1 ; (1) Enable front buffer update
+        maxPraGDOP     100 ; Highest allowable PRA GDOP
+        maxPraFitErr 0.003 ; Highest allowable PRA max fit error
+        printTiming      0 ; (1) Print VINS timing warnings
+    }
+}
+
+;==============================================================================
+FusionCore
+{
+    Master
+    {
+        ahDataPath          Null ; Path to autoHarmData.txt (Null = local directory).
+        ahStopCriteriaTau   0.01 ; INS latency uncertainty in seconds. Default = 0.01.
+        loseLockDelayMotion 3.0  ; 
+        loseLockDelayFixed  0.75 ;
+        maxPraError         0.50 ;
+        isPlatformAHRS      0    ; 1 = true.
+        profile             8    ; sfCore filter profile
+        enhancement         0    ; 0 = off. Min 1, Max 5 (mm)
+
+        ; AHRS stop criteria. RPY uncertainty in radians.
+        ; Defaults 0.005, 0.005, 0.005
+        AhStopCriteria
+        {
+            roll  0.005
+            pitch 0.005
+            yaw   0.005
+        }
+
+        ;
+        AhExcessiveDriftCriteria
+        {
+            jump  0.06
+            drift 0.03
+        }
+
+        ; ODOP thresholds for tracking states 1-4.
+        OdopThreshold
+        {
+            state1 5
+            state2 5
+            state3 15
+            state4 15
+        }	
+    }
+}
