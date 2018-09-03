@@ -905,15 +905,15 @@ private:
 
     void updateExports(double pred, TrkData *data);
 
-    bool tcpSfRxEnabled = true;
-    std::string tcpSfRxAddr = "localhost";
-    std::string tcpSfRxPort = "51717";
-    std::string udpSfRxPort = "9001";
-    std::string udpSfRxImgPort = "9003";
-    std::string udpSfRxInputPort = "9004";
-    std::string udpSfCorePort = "9002";
-    std::string udpSfHubPort = "9005";
-	  std::string udpNftPort = "9007";
+    bool tcpSfRxEnabled;
+    std::string tcpSfRxAddr;
+    std::string tcpSfRxPort;
+    std::string udpSfRxPort;
+    std::string udpSfRxImgPort;
+    std::string udpSfRxInputPort;
+    std::string udpSfCorePort;
+    std::string udpSfHubPort;
+	  std::string udpNftPort;
     std::string sMemImgName;
     int udpSfRxRcvBufSize;
     int udpSfRxImgRcvBufSize;
