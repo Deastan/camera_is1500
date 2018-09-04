@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   sensor_msgs
   std_msgs
+  nav_msgs
 )
 
 ###################################
@@ -34,6 +35,7 @@ catkin_package(
     visualization_msgs
     std_msgs
     std_srvs
+    nav_msgs
 #  DEPENDS
 )
 
