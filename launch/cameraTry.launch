@@ -4,7 +4,7 @@
     <!-- transformation between camera and base_link -->
     <node pkg="tf2_ros" type="static_transform_publisher"
       name="base_camera_broadcaster"
-      args="0.75 0 0.83 0 3.4906 0 base_link base_camera" />
+      args="0.75 0 0.83 0.23 3.4906 0 base_link base_camera" />
     <!-- <node name="sfHub" pkg="camera_is1500" type="script" output="screen">
     </node> -->
     <!-- <node name="sfHub" pkg="camera_is1500" type="scriptSHub" output="screen">
