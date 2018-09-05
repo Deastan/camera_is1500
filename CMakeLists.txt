@@ -13,6 +13,8 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   nav_msgs
+  #Eigen3
+  #Eigen REQUIRED
 )
 
 ###################################
@@ -25,6 +27,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
+  #INCLUDE_DIRS include ${Eigen_INCLUDE_DIRS}
   INCLUDE_DIRS
   include
 #  LIBRARIES
@@ -36,7 +39,7 @@ catkin_package(
     std_msgs
     std_srvs
     nav_msgs
-#  DEPENDS
+#  DEPENDS #Eigen
 )
 
 catkin_package()
@@ -51,6 +54,8 @@ include_directories(include/camera_is1500
                     ${catkin_INCLUDE_DIRS}
                     ${Boost_INCLUDE_DIRS}
                     ${GSTREAMER_INCLUDE_DIRS}
+                    #${EIGEN3_INCLUDE_DIR}
+                    #${Eigen_INCLUDE_DIRS}
                     #lib
 )
 
