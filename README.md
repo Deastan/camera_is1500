@@ -1,6 +1,7 @@
 # camera_is1500
 
 Ros package for camera
+(If issue, it might miss a library ! Check the folder lib)
 
 From the computer of Jonathan:
 - open the terminal
