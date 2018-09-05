@@ -112,7 +112,7 @@ int main(int argc, char **argv)
 //     The time at which the value of the transform is desired. (0 will get the latest)
 //     Returns:
 //     The transform between the frames
-      transformStamped = tfBuffer.lookupTransform("base_camera", "base_link",
+      transformStamped = tfBuffer.lookupTransform("base_link", "base_camera",
                                ros::Time(0));
     }
     catch (tf2::TransformException &ex) {
@@ -154,7 +154,7 @@ int main(int argc, char **argv)
     //set the position
     base_camera_odom.pose.pose.position.x = base_camera_position.point.x;
     base_camera_odom.pose.pose.position.y = base_camera_position.point.y;
-    base_camera_odom.pose.pose.position.z = 0;
+    base_camera_odom.pose.pose.position.z = base_camera_position.point.z;
     // odom.pose.pose.position.x = x_b;//v[3];
     // odom.pose.pose.position.y = y_b;//v[4];
     // odom.pose.pose.position.z = z_b;//v[5];
