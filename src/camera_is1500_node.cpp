@@ -93,6 +93,8 @@ int main(int argc, char **argv)
     // v is a table of float with the data of the IMU of the camera
     // organised as roll   pitch    yaw   posx   posy   posz
     v = overGetData();
+    std::cout << v[3] << ", " << v[4] << ", " << v[5] << ", " <<
+      v[0] << ", " << v[1] << ", " << v[2] << ", " << std::endl;
 
     geometry_msgs::PointStamped base_camera_position;
     base_camera_position = geometry_msgs::PointStamped();
@@ -120,13 +122,13 @@ int main(int argc, char **argv)
       ros::Duration(1.0).sleep();
       continue;
     }
-    std::cout << "Screen before transfomation : " << base_camera_position.point.x << ", "
-    << base_camera_position.point.y << ", " << base_camera_position.point.z << std::endl;
+    // std::cout << "Screen before transfomation : " << base_camera_position.point.x << ", "
+    // << base_camera_position.point.y << ", " << base_camera_position.point.z << std::endl;
 
     tf2::doTransform(base_camera_position, base_camera_position, transformStamped);
 
-    std::cout << "Screen after transfomation : " << base_camera_position.point.x << ", "
-    << base_camera_position.point.y << ", " << base_camera_position.point.z << std::endl;
+    // std::cout << "Screen after transfomation : " << base_camera_position.point.x << ", "
+    // << base_camera_position.point.y << ", " << base_camera_position.point.z << std::endl;
 
     // transformStamped.waitForTransform("/base_camera", "/base_link", current_time, ros::Duration(1.0));
     // transformStamped.getOrigin ();
