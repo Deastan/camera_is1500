@@ -85,6 +85,7 @@ int main(int argc, char **argv)
   // std::vector<float> position_base_camera;
   // float x_before = 0;
   // float vel_x = 0;
+  // ROS_INFO_ONCE("Get data from the camera");
   while(nh.ok())
   {
     // float dt = (current_time - last_time).toSec();
@@ -93,8 +94,8 @@ int main(int argc, char **argv)
     // v is a table of float with the data of the IMU of the camera
     // organised as roll   pitch    yaw   posx   posy   posz
     v = overGetData();
-    std::cout << v[3] << ", " << v[4] << ", " << v[5] << ", " <<
-      v[0] << ", " << v[1] << ", " << v[2] << ", " << std::endl;
+    // std::cout << v[3] << ", " << v[4] << ", " << v[5] << ", " <<
+    //   v[0] << ", " << v[1] << ", " << v[2] << ", " << std::endl;
 
     geometry_msgs::PointStamped base_camera_position;
     base_camera_position = geometry_msgs::PointStamped();
@@ -136,7 +137,7 @@ int main(int argc, char **argv)
 
     nav_msgs::Odometry odom;
     odom.header.stamp = current_time;
-    odom.header.frame_id = "odom_base_camera";
+    odom.header.frame_id = "base_camera";
     //set the position
     odom.pose.pose.position.x = v[3];
     odom.pose.pose.position.y = v[4];
@@ -152,7 +153,7 @@ int main(int argc, char **argv)
 
     nav_msgs::Odometry base_camera_odom;
     base_camera_odom.header.stamp = current_time;
-    base_camera_odom.header.frame_id = "odom_base_camera";
+    base_camera_odom.header.frame_id = "base_link";
     //set the position
     base_camera_odom.pose.pose.position.x = base_camera_position.point.x;
     base_camera_odom.pose.pose.position.y = base_camera_position.point.y;
