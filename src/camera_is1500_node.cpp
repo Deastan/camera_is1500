@@ -56,7 +56,7 @@ int main(int argc, char **argv)
   current_time = ros::Time::now();
   last_time = ros::Time::now();
   // float h = 0.83;
-  float l = 0.75; // [m] in meter
+  float l = 0.835; // [m] in meter
   // float x_c = 0, y_c = 0, z_c = 0; // position measured in the camera_frame
   // float x_b = 0, y_b = 0, z_b = 0; // position measured by the camera in bodey_frame (base_link)
   // float alpha = 0/180*3.14155927; // angle of the camera with its vertical in radians
@@ -86,6 +86,7 @@ int main(int argc, char **argv)
   // float x_before = 0;
   // float vel_x = 0;
   // ROS_INFO_ONCE("Get data from the camera");
+  std::cout << "Geting data from the camera" << std::endl;
   while(nh.ok())
   {
     // float dt = (current_time - last_time).toSec();
@@ -98,43 +99,35 @@ int main(int argc, char **argv)
     //   v[0] << ", " << v[1] << ", " << v[2] << ", " << std::endl;
 
     geometry_msgs::PointStamped base_camera_position;
-    base_camera_position = geometry_msgs::PointStamped();
-    base_camera_position.header.frame_id = "base_camera";
-    base_camera_position.header.stamp = current_time;
-    base_camera_position.point.x = v[3];
-    base_camera_position.point.y = v[4];
-    base_camera_position.point.z = v[5];
+    base_camera_position = geometry_msgs::PointStamped();//TODO unused
+    base_camera_position.header.frame_id = "base_camera";//TODO unused
+    base_camera_position.header.stamp = current_time;//TODO unused
+    base_camera_position.point.x = v[3];//TODO unused
+    base_camera_position.point.y = v[4];//TODO unused
+    base_camera_position.point.z = v[5];//TODO unused//TODO unused
 
     try{
-// lookupTransform(const std::string &  	target_frame,
-// 	const std::string &  	source_frame,
-// 	const ros::Time &  	time ) 		const)
-//     Parameters:
-//     target_frame	The frame to which data should be transformed
-//     source_frame	The frame where the data originated time
-//     The time at which the value of the transform is desired. (0 will get the latest)
-//     Returns:
-//     The transform between the frames
-      transformStamped = tfBuffer.lookupTransform("base_link", "base_camera",
-                               ros::Time(0));
+    // lookupTransform(const std::string &  	target_frame,
+    // 	const std::string &  	source_frame,
+    // 	const ros::Time &  	time ) 		const)
+    //     Parameters:
+    //     target_frame	The frame to which data should be transformed
+    //     source_frame	The frame where the data originated time
+    //     The time at which the value of the transform is desired. (0 will get the latest)
+    //     Returns:
+    //     The transform between the frames
+    transformStamped = tfBuffer.lookupTransform("base_link", "base_camera",
+                               ros::Time(0));//TODO unused
     }
     catch (tf2::TransformException &ex) {
       ROS_WARN("%s",ex.what());
       ros::Duration(1.0).sleep();
       continue;
     }
-    // std::cout << "Screen before transfomation : " << base_camera_position.point.x << ", "
-    // << base_camera_position.point.y << ", " << base_camera_position.point.z << std::endl;
 
-    tf2::doTransform(base_camera_position, base_camera_position, transformStamped);
+    tf2::doTransform(base_camera_position, base_camera_position, transformStamped);//TODO unused
 
-    // std::cout << "Screen after transfomation : " << base_camera_position.point.x << ", "
-    // << base_camera_position.point.y << ", " << base_camera_position.point.z << std::endl;
-
-    // transformStamped.waitForTransform("/base_camera", "/base_link", current_time, ros::Duration(1.0));
-    // transformStamped.getOrigin ();
-    // base_camera_position.tr
-
+    // Position of the camera from the origine
     nav_msgs::Odometry odom;
     odom.header.stamp = current_time;
     odom.header.frame_id = "base_camera";
@@ -142,30 +135,28 @@ int main(int argc, char **argv)
     odom.pose.pose.position.x = v[3];
     odom.pose.pose.position.y = v[4];
     odom.pose.pose.position.z = v[5];
-    // odom.pose.pose.position.x = x_b;//v[3];
-    // odom.pose.pose.position.y = y_b;//v[4];
-    // odom.pose.pose.position.z = z_b;//v[5];
+
     // ODOM ARE USED in DEGREES  !!!
     odom.pose.pose.orientation.x = v[0];
     odom.pose.pose.orientation.y = v[1];
     odom.pose.pose.orientation.z = v[2];
     odom.pose.pose.orientation.w = 1;
 
-    nav_msgs::Odometry base_camera_odom;
-    base_camera_odom.header.stamp = current_time;
-    base_camera_odom.header.frame_id = "base_link";
+
+    // Change the camera frame to base_link manually.
+    nav_msgs::Odometry base_link_frame_odom_from_camera;
+    base_link_frame_odom_from_camera.header.stamp = current_time;
+    base_link_frame_odom_from_camera.header.frame_id = "base_link";
     //set the position
-    base_camera_odom.pose.pose.position.x = base_camera_position.point.x;
-    base_camera_odom.pose.pose.position.y = base_camera_position.point.y;
-    base_camera_odom.pose.pose.position.z = base_camera_position.point.z;
-    // odom.pose.pose.position.x = x_b;//v[3];
-    // odom.pose.pose.position.y = y_b;//v[4];
-    // odom.pose.pose.position.z = z_b;//v[5];
+    base_link_frame_odom_from_camera.pose.pose.position.x = v[3]-cos(DEGTORAD(v[2]))*l;
+    base_link_frame_odom_from_camera.pose.pose.position.y = v[4]-sin(DEGTORAD(v[2]))*l;
+    base_link_frame_odom_from_camera.pose.pose.position.z = 0;
+
     // ODOM ARE USED in DEGREES  !!!
-    base_camera_odom.pose.pose.orientation.x = 0;
-    base_camera_odom.pose.pose.orientation.y = 0;
-    base_camera_odom.pose.pose.orientation.z = v[2];//tf::createQuaternionMsgFromYaw(sin(base_camera_position.point.y/l));
-    base_camera_odom.pose.pose.orientation.w = 1;
+    base_link_frame_odom_from_camera.pose.pose.orientation.x = 0;
+    base_link_frame_odom_from_camera.pose.pose.orientation.y = 0;
+    base_link_frame_odom_from_camera.pose.pose.orientation.z = v[2];//tf::createQuaternionMsgFromYaw(sin(base_camera_position.point.y/l));
+    base_link_frame_odom_from_camera.pose.pose.orientation.w = 1;
     // //set the velocity
     // odom.child_frame_id = "base_link";
     // odom.twist.twist.linear.x = vel_x;
@@ -174,13 +165,13 @@ int main(int argc, char **argv)
 
     //publish the message
     track_pub.publish(odom);
-    odom_track_pub.publish(base_camera_odom);
+    odom_track_pub.publish(base_link_frame_odom_from_camera);
 
     last_time = current_time;
 
     ros::spinOnce();
     loop_rate.sleep();
   } // end loop
-
+    std::cout << "End of the node : camera_is1500_node" << std::endl;
   return 0;
 } // end main
