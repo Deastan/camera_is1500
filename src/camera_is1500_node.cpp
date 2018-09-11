@@ -64,8 +64,9 @@ int main(int argc, char **argv)
   // init. publisher
   ros::NodeHandle nh;
   // ros::Publisher track_pub = nh.advertise<sensor_msgs::PointCloud>("track_camera", 1000);
-  ros::Publisher track_pub = nh.advertise<nav_msgs::Odometry>("odom_camera_is1500", 1000);
+  ros::Publisher track_pub = nh.advertise<nav_msgs::Odometry>("position_camera_is1500", 1000);
   ros::Publisher odom_track_pub = nh.advertise<nav_msgs::Odometry>("base_link_odom_camera_is1500", 1000);
+  ros::Publisher odom_track_tf_pub = nh.advertise<nav_msgs::Odometry>("base_link_odom_camera_is1500_TF", 1000);
 
   // Tf2
   tf2_ros::Buffer tfBuffer;
@@ -143,7 +144,7 @@ int main(int argc, char **argv)
     odom.pose.pose.orientation.w = 1;
 
 
-    // Change the camera frame to base_link manually.
+    // Transform the camera frame to base_link manually.
     nav_msgs::Odometry base_link_frame_odom_from_camera;
     base_link_frame_odom_from_camera.header.stamp = current_time;
     base_link_frame_odom_from_camera.header.frame_id = "base_link";
@@ -163,9 +164,25 @@ int main(int argc, char **argv)
     // odom.twist.twist.linear.y = v[1];
     // odom.twist.twist.angular.z = v[1];
 
+
+    // Transform the camera frame to base_link manually.
+    nav_msgs::Odometry camera_to_base_link_with_tf
+    camera_to_base_link_with_tfcamera_to_base_link_with_tf.header.stamp = current_time;
+    camera_to_base_link_with_tf.header.frame_id = "base_link";
+    //set the position
+    camera_to_base_link_with_tf.pose.pose.position.x = base_camera_position.point.x;
+    camera_to_base_link_with_tf.pose.pose.position.y = base_camera_position.point.y;
+    camera_to_base_link_with_tf.pose.pose.position.z = 0;
+
+    // ODOM ARE USED in DEGREES  !!!
+    camera_to_base_link_with_tf.pose.pose.orientation.x = 0;
+    camera_to_base_link_with_tf.pose.pose.orientation.y = 0;
+    camera_to_base_link_with_tf.pose.pose.orientation.z = v[2];//tf::createQuaternionMsgFromYaw(sin(base_camera_position.point.y/l));
+    camera_to_base_link_with_tf.pose.pose.orientation.w = 1;
     //publish the message
     track_pub.publish(odom);
     odom_track_pub.publish(base_link_frame_odom_from_camera);
+    odom_track_tf_pub.publish(camera_to_base_link_with_tf);
 
     last_time = current_time;
 
