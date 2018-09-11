@@ -166,8 +166,8 @@ int main(int argc, char **argv)
 
 
     // Transform the camera frame to base_link manually.
-    nav_msgs::Odometry camera_to_base_link_with_tf
-    camera_to_base_link_with_tfcamera_to_base_link_with_tf.header.stamp = current_time;
+    nav_msgs::Odometry camera_to_base_link_with_tf;
+    camera_to_base_link_with_tf.header.stamp = current_time;
     camera_to_base_link_with_tf.header.frame_id = "base_link";
     //set the position
     camera_to_base_link_with_tf.pose.pose.position.x = base_camera_position.point.x;
