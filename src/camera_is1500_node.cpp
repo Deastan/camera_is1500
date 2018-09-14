@@ -75,16 +75,19 @@ int main(int argc, char **argv)
   // Read sfaccess.ini file and open tracker interface
   if (!overInit())
   {
-      std::cout << "Error: Failed to open sfAccess : Could be an issue in camera_is1500_node.cpp or in the interface.cpp (library) "  << std::endl;
+      // std::cout << "Error: Failed to open sfAccess : Could be an issue in camera_is1500_node.cpp or in the interface.cpp (library) "  << std::endl;
+      ROS_WARN("Error: Failed to open sfAccess : Could be an issue in camera_is1500_node.cpp or in the interface.cpp (library)");
       return 0;
   }
+  ROS_INFO_STREAM("Camera is connected");
 
   std::vector<float> v;
   // std::vector<float> position_base_camera;
   // float x_before = 0;
   // float vel_x = 0;
   // ROS_INFO_ONCE("Get data from the camera");
-  std::cout << "Geting data from the camera" << std::endl;
+  // std::cout << "Geting data from the camera" << std::endl;
+  ROS_INFO_STREAM("Geting data from the camera");
   while(nh.ok())
   {
     // float dt = (current_time - last_time).toSec();
@@ -178,6 +181,7 @@ int main(int argc, char **argv)
     camera_to_base_link_with_tf.pose.pose.orientation.y = 0;
     camera_to_base_link_with_tf.pose.pose.orientation.z = q[2];
     camera_to_base_link_with_tf.pose.pose.orientation.w = 1;
+
     //publish the message
     track_pub.publish(odom);
     odom_track_pub.publish(base_link_frame_odom_from_camera);
@@ -188,6 +192,17 @@ int main(int argc, char **argv)
     ros::spinOnce();
     loop_rate.sleep();
   } // end loop
-    std::cout << "End of the node : camera_is1500_node" << std::endl;
+
+  if (!overClose())
+  {
+      // std::cout << "Error: Failed to open sfAccess : Could be an issue in camera_is1500_node.cpp or in the interface.cpp (library) "  << std::endl;
+      ROS_WARN("Failed to close sfAccess");
+      return 0;
+  }else
+  {
+    ROS_INFO_STREAM("sfAccess is closed");
+  }
+  ROS_INFO_STREAM("End of the node : camera_is1500_node");
+  // std::cout << "End of the node : camera_is1500_node" << std::endl;
   return 0;
 } // end main
