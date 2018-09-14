@@ -55,11 +55,8 @@ int main(int argc, char **argv)
   ros::Time current_time, last_time;
   current_time = ros::Time::now();
   last_time = ros::Time::now();
-  // float h = 0.83;
+  // Distance between
   float l = 0.835; // [m] in meter
-  // float x_c = 0, y_c = 0, z_c = 0; // position measured in the camera_frame
-  // float x_b = 0, y_b = 0, z_b = 0; // position measured by the camera in bodey_frame (base_link)
-  // float alpha = 0/180*3.14155927; // angle of the camera with its vertical in radians
 
   // init. publisher
   ros::NodeHandle nh;
@@ -145,6 +142,8 @@ int main(int argc, char **argv)
 
 
     // Transform the camera frame to base_link manually.
+    tf::Quaternion q = tf::createQuaternionFromRPY(0, 0, DEGTORAD(v[2]));//v[2]));  // Create this quaternion from roll/pitch/yaw (in radians)
+    std::cout << q[0] << " " << q[1] << " " << q[2] << " " << q[3] << std::endl;
     nav_msgs::Odometry base_link_frame_odom_from_camera;
     base_link_frame_odom_from_camera.header.stamp = current_time;
     base_link_frame_odom_from_camera.header.frame_id = "base_link";
@@ -153,11 +152,11 @@ int main(int argc, char **argv)
     base_link_frame_odom_from_camera.pose.pose.position.y = v[4]-sin(DEGTORAD(v[2]))*l;
     base_link_frame_odom_from_camera.pose.pose.position.z = 0;
 
-    // ODOM ARE USED in DEGREES  !!!
-    base_link_frame_odom_from_camera.pose.pose.orientation.x = 0;
-    base_link_frame_odom_from_camera.pose.pose.orientation.y = 0;
-    base_link_frame_odom_from_camera.pose.pose.orientation.z = v[2];//tf::createQuaternionMsgFromYaw(sin(base_camera_position.point.y/l));
-    base_link_frame_odom_from_camera.pose.pose.orientation.w = 1;
+    // ODOM ARE USED in quat  !!!
+    base_link_frame_odom_from_camera.pose.pose.orientation.x = q[0];
+    base_link_frame_odom_from_camera.pose.pose.orientation.y = q[1];
+    base_link_frame_odom_from_camera.pose.pose.orientation.z = q[2];//tf::createQuaternionMsgFromYaw(sin(base_camera_position.point.y/l));
+    base_link_frame_odom_from_camera.pose.pose.orientation.w = q[3];
     // //set the velocity
     // odom.child_frame_id = "base_link";
     // odom.twist.twist.linear.x = vel_x;
@@ -165,7 +164,7 @@ int main(int argc, char **argv)
     // odom.twist.twist.angular.z = v[1];
 
 
-    // Transform the camera frame to base_link manually.
+    // Transform the camera frame to base_link with tf
     nav_msgs::Odometry camera_to_base_link_with_tf;
     camera_to_base_link_with_tf.header.stamp = current_time;
     camera_to_base_link_with_tf.header.frame_id = "base_link";
@@ -174,10 +173,10 @@ int main(int argc, char **argv)
     camera_to_base_link_with_tf.pose.pose.position.y = base_camera_position.point.y;
     camera_to_base_link_with_tf.pose.pose.position.z = 0;
 
-    // ODOM ARE USED in DEGREES  !!!
+    // ODOM ARE USED in quat  !!!
     camera_to_base_link_with_tf.pose.pose.orientation.x = 0;
     camera_to_base_link_with_tf.pose.pose.orientation.y = 0;
-    camera_to_base_link_with_tf.pose.pose.orientation.z = v[2];//tf::createQuaternionMsgFromYaw(sin(base_camera_position.point.y/l));
+    camera_to_base_link_with_tf.pose.pose.orientation.z = q[2];
     camera_to_base_link_with_tf.pose.pose.orientation.w = 1;
     //publish the message
     track_pub.publish(odom);
