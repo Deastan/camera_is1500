@@ -141,8 +141,8 @@ int main(int argc, char **argv)
     //
     // tf2::doTransform(base_camera_position, base_camera_position, transformStamped);//TODO unused
 
-    std::cout << curr_x << ", " << curr_y << ", " << v[2] << ", " <<
-      vel_x << ", " << vel_y << ", " << vel_yaw << ", "  << std::endl;
+    // std::cout << curr_x << ", " << curr_y << ", " << v[2] << ", " <<
+    //   vel_x << ", " << vel_y << ", " << vel_yaw << ", "  << std::endl;
 
     // std::cout << v[3] << ", " << v[4] << ", " << v[5] << ", " <<
     //   v[0] << ", " << v[1] << ", " << v[2] << ", " <<
@@ -152,7 +152,7 @@ int main(int argc, char **argv)
     nav_msgs::Odometry odom;
     odom.header.stamp = current_time;
     odom.header.frame_id = "odom_camera";
-    // odom.child_frame_id = "base_camera";
+    odom.child_frame_id = "base_link_camera";
     //set the position
     odom.pose.pose.position.x = v[3];
     odom.pose.pose.position.y = v[4];
@@ -179,6 +179,7 @@ int main(int argc, char **argv)
     nav_msgs::Odometry base_link_frame_odom_from_camera;
     base_link_frame_odom_from_camera.header.stamp = current_time;
     base_link_frame_odom_from_camera.header.frame_id = "odom";
+    base_link_frame_odom_from_camera.child_frame_id = "base_link";
     //set the position
     base_link_frame_odom_from_camera.pose.pose.position.x = v[3]-cos(DEGTORAD(v[2]))*l;
     base_link_frame_odom_from_camera.pose.pose.position.y = v[4]-sin(DEGTORAD(v[2]))*l;

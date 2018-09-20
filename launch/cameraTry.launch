@@ -1,10 +1,12 @@
 <launch>
     <node name="anyName" pkg="camera_is1500" type="camera_is1500" output="screen">
+      <!-- <remap from="base_link_odom_camera_is1500" to="odom"/>   -->
     </node>
     <!-- transformation between camera and base_link -->
     <node pkg="tf2_ros" type="static_transform_publisher"
       name="base_camera_broadcaster"
       args="0.835 0 1.092 0 0 0 base_link base_camera" respawn="true"/>
+
     <!-- <node name="sfHub" pkg="camera_is1500" type="script" output="screen">
       </node> -->
     <!-- <node name="sfHub" pkg="camera_is1500" type="scriptSHub" output="screen">
