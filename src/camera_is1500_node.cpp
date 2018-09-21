@@ -23,6 +23,7 @@
 
 // tf1
  #include <tf/tf.h>
+ #include <tf/transform_broadcaster.h>
 // tf2 transformation
 #include <tf2_ros/buffer.h>
 // #include <tf2/transform_datatypes.h>
@@ -52,12 +53,14 @@ double last_y = 0;
 double last_yaw = 0;
 double last_vx = 0;
 double last_vyaw = 0;
-
+tf::Transform transform;
+tf::TransformBroadcaster *tf_broadcaster;
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "interface_sfHub_ros_node");
   ros::start();
   ros::Time last_time;
+  tf2_ros::TransformBroadcaster br;
 
   // Variable init :
   // Distance between
@@ -102,23 +105,37 @@ int main(int argc, char **argv)
     double vel_y = dy/dt;
     double vel_yaw = (v[2] - last_yaw/dt);
 
-    // float dt = (current_time - last_time).toSec();
-    geometry_msgs::TransformStamped transformStamped;
 
-    // v is a table of float with the data of the IMU of the camera
-    // organised as roll   pitch    yaw   posx   posy   posz
-    // vel_x vel_y vel_z omega_1 omega_2 omega_3
+    // ODOM ARE USED in Quaternion  !!!
+    // tf::Quaternion q_robot = tf::createQuaternionFromRPY(0, 0, DEGTORAD(v[2]));
+    //first, we'll publish the transforms over tf
+    geometry_msgs::TransformStamped odom_trans;
+    odom_trans.header.stamp = current_time;
+    odom_trans.header.frame_id = "odom_cam";
+    odom_trans.child_frame_id = "base_link_cam";
+    odom_trans.transform.translation.x = curr_x;
+    odom_trans.transform.translation.y = curr_y;
+    odom_trans.transform.translation.z = 0.0;
+    odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(DEGTORAD(v[2]));
+    br.sendTransform(odom_trans);
 
-    // std::cout << v[3] << ", " << v[4] << ", " << v[5] << ", " <<
-    //   v[0] << ", " << v[1] << ", " << v[2] << ", " << std::endl;
-
-    geometry_msgs::PointStamped base_camera_position;
-    base_camera_position = geometry_msgs::PointStamped();//TODO unused
-    base_camera_position.header.frame_id = "base_camera";//TODO unused
-    base_camera_position.header.stamp = current_time;//TODO unused
-    base_camera_position.point.x = v[3];//TODO unused
-    base_camera_position.point.y = v[4];//TODO unused
-    base_camera_position.point.z = v[5];//TODO unused//TODO unused
+    // // float dt = (current_time - last_time).toSec();
+    // geometry_msgs::TransformStamped transformStamped;
+    //
+    // // v is a table of float with the data of the IMU of the camera
+    // // organised as roll   pitch    yaw   posx   posy   posz
+    // // vel_x vel_y vel_z omega_1 omega_2 omega_3
+    //
+    // // std::cout << v[3] << ", " << v[4] << ", " << v[5] << ", " <<
+    // //   v[0] << ", " << v[1] << ", " << v[2] << ", " << std::endl;
+    //
+    // geometry_msgs::PointStamped base_camera_position;
+    // base_camera_position = geometry_msgs::PointStamped();//TODO unused
+    // base_camera_position.header.frame_id = "base_camera";//TODO unused
+    // base_camera_position.header.stamp = current_time;//TODO unused
+    // base_camera_position.point.x = v[3];//TODO unused
+    // base_camera_position.point.y = v[4];//TODO unused
+    // base_camera_position.point.z = v[5];//TODO unused//TODO unused
 
     // try{
     // // lookupTransform(const std::string &  	target_frame,
@@ -151,22 +168,22 @@ int main(int argc, char **argv)
     // Position of the camera in the reference of the camera
     nav_msgs::Odometry odom;
     odom.header.stamp = current_time;
-    odom.header.frame_id = "odom_camera";
-    odom.child_frame_id = "base_link_camera";
+    odom.header.frame_id = "odom_cam";
+    odom.child_frame_id = "base_link_cam";
     //set the position
     odom.pose.pose.position.x = v[3];
     odom.pose.pose.position.y = v[4];
     odom.pose.pose.position.z = v[5];
 
-    // ODOM ARE USED in Quaternion  !!!
     tf::Quaternion quat = tf::createQuaternionFromRPY(
                           DEGTORAD(v[0]), DEGTORAD(v[1]), DEGTORAD(v[2]));
+
     odom.pose.pose.orientation.x = quat[0];
     odom.pose.pose.orientation.y = quat[1];
     odom.pose.pose.orientation.z = quat[2];
     odom.pose.pose.orientation.w = quat[3];
     // //set the velocity
-    odom.child_frame_id = "base_camera";
+    odom.child_frame_id = "base_link_cam";
     odom.twist.twist.linear.x = vel_x;
     odom.twist.twist.linear.y = vel_y;
     odom.twist.twist.angular.z = vel_yaw;
@@ -178,8 +195,8 @@ int main(int argc, char **argv)
 
     nav_msgs::Odometry base_link_frame_odom_from_camera;
     base_link_frame_odom_from_camera.header.stamp = current_time;
-    base_link_frame_odom_from_camera.header.frame_id = "odom";
-    base_link_frame_odom_from_camera.child_frame_id = "base_link";
+    base_link_frame_odom_from_camera.header.frame_id = "odom_cam";
+    base_link_frame_odom_from_camera.child_frame_id = "base_link_cam";
     //set the position
     base_link_frame_odom_from_camera.pose.pose.position.x = v[3]-cos(DEGTORAD(v[2]))*l;
     base_link_frame_odom_from_camera.pose.pose.position.y = v[4]-sin(DEGTORAD(v[2]))*l;
@@ -191,7 +208,7 @@ int main(int argc, char **argv)
     base_link_frame_odom_from_camera.pose.pose.orientation.z = q[2];//tf::createQuaternionMsgFromYaw(sin(base_camera_position.point.y/l));
     base_link_frame_odom_from_camera.pose.pose.orientation.w = q[3];
     //set the velocity
-    odom.child_frame_id = "base_link";
+    odom.child_frame_id = "base_link_cam";
     odom.twist.twist.linear.x = pow(pow(vel_x, 2.0) + pow(vel_y, 2.0), 0.5);
     odom.twist.twist.linear.y = 0;
     odom.twist.twist.angular.z = vel_yaw;
