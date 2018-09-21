@@ -113,8 +113,8 @@ int main(int argc, char **argv)
     odom_trans.header.stamp = current_time;
     odom_trans.header.frame_id = "odom_cam";
     odom_trans.child_frame_id = "base_link_cam";
-    odom_trans.transform.translation.x = v[3]-cos(DEGTORAD(v[2]))*l;
-    odom_trans.transform.translation.y = v[4]-sin(DEGTORAD(v[2]))*l;
+    odom_trans.transform.translation.x = curr_x-cos(DEGTORAD(v[2]))*l;
+    odom_trans.transform.translation.y = curr_y-sin(DEGTORAD(v[2]))*l;
     odom_trans.transform.translation.z = 0.0;
     odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(DEGTORAD(v[2]));
     br.sendTransform(odom_trans);
