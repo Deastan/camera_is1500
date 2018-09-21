@@ -208,10 +208,10 @@ int main(int argc, char **argv)
     base_link_frame_odom_from_camera.pose.pose.orientation.z = q[2];//tf::createQuaternionMsgFromYaw(sin(base_camera_position.point.y/l));
     base_link_frame_odom_from_camera.pose.pose.orientation.w = q[3];
     //set the velocity
-    odom.child_frame_id = "base_link_cam";
-    odom.twist.twist.linear.x = pow(pow(vel_x, 2.0) + pow(vel_y, 2.0), 0.5);
-    odom.twist.twist.linear.y = 0;
-    odom.twist.twist.angular.z = vel_yaw;
+    base_link_frame_odom_from_camera.child_frame_id = "base_link_cam";
+    base_link_frame_odom_from_camera.twist.twist.linear.x = pow(pow(vel_x, 2.0) + pow(vel_y, 2.0), 0.5);
+    base_link_frame_odom_from_camera.twist.twist.linear.y = 0;
+    base_link_frame_odom_from_camera.twist.twist.angular.z = vel_yaw;
 
     // // Transform the camera frame to base_link with tf
     // nav_msgs::Odometry camera_to_base_link_with_tf;
