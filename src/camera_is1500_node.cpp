@@ -126,8 +126,8 @@ int main(int argc, char **argv)
     // // organised as roll   pitch    yaw   posx   posy   posz
     // // vel_x vel_y vel_z omega_1 omega_2 omega_3
     //
-    // // std::cout << v[3] << ", " << v[4] << ", " << v[5] << ", " <<
-    // //   v[0] << ", " << v[1] << ", " << v[2] << ", " << std::endl;
+    std::cout << v[3] << ", " << v[4] << ", " << v[5] << ", " <<
+      v[0] << ", " << v[1] << ", " << v[2] << ", " << std::endl;
     //
     // geometry_msgs::PointStamped base_camera_position;
     // base_camera_position = geometry_msgs::PointStamped();//TODO unused
