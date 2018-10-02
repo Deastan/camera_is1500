@@ -38,15 +38,6 @@
 
 double test; // Only here fore test...
 
-// Initialized variable
-double last_x = 0;
-double last_y = 0;
-double last_yaw = 0;
-double last_vx = 0;
-double last_vyaw = 0;
-// tf::Transform transform;
-// tf::TransformBroadcaster *tf_broadcaster;
-
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "interface_sfHub_ros_node");
@@ -54,7 +45,12 @@ int main(int argc, char **argv)
   ros::Time last_time;
   tf2_ros::TransformBroadcaster br;
 
-  // Variable init :
+  // Variables initialization :
+  double last_x = 0;
+  double last_y = 0;
+  double last_yaw = 0;
+  double last_vx = 0;
+  double last_vyaw = 0;
   // Distance between center of robot and camera
   float l = 0.835; // [m] in meter
 
@@ -113,13 +109,6 @@ int main(int argc, char **argv)
     odom_trans.transform.translation.z = 0.0;
     odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(DEGTORAD(v[2]));
     br.sendTransform(odom_trans);
-
-    // test Parameters
-    if(!nh.getParam("/anyName/nombre", test))
-    {
-      ROS_ERROR("Could not find topic parameter : /anyName/nombre");
-    }
-    // std::cout << "Le nombre est : " << test << std::endl;
 
     // Position of the camera in the reference of the camera
     nav_msgs::Odometry odom;
@@ -197,3 +186,11 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("End of the node : camera_is1500_node");
   return 0;
 } // end main
+
+
+// test get pearameters
+// if(!nh.getParam("/anyName/nombre", test))
+// {
+//   ROS_ERROR("Could not find topic parameter : /anyName/nombre");
+// }
+// // std::cout << "Le nombre est : " << test << std::endl;
