@@ -73,10 +73,9 @@ int main(int argc, char **argv)
   // Read sfaccess.ini file and open tracker interface
   if (!overInit())
   {
-      // std::cout << "Error: Failed to open sfAccess : Could be an issue in camera_is1500_node.cpp or in the interface.cpp (library) "  << std::endl;
       ROS_WARN("Error: Failed to open sfAccess : Could be an issue in camera_is1500_node.cpp or in the interface.cpp (library)");
       return 0;
-  }overClose
+  }else
   {
     ROS_INFO_STREAM("Camera is connected");
   }
@@ -120,7 +119,7 @@ int main(int argc, char **argv)
     {
       ROS_ERROR("Could not find topic parameter : /anyName/nombre");
     }
-    std::cout << "Le nombre est : " << test << std::endl;
+    // std::cout << "Le nombre est : " << test << std::endl;
 
     // Position of the camera in the reference of the camera
     nav_msgs::Odometry odom;
