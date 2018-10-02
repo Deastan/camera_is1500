@@ -97,13 +97,11 @@ int main(int argc, char **argv)
     double vel_y = dy/dt;
     double vel_yaw = (v[2] - last_yaw/dt);
 
-    // ODOM ARE USED in Quaternion  !!!
-    // tf::Quaternion q_robot = tf::createQuaternionFromRPY(0, 0, DEGTORAD(v[2]));
-    //first, we'll publish the transforms over tf
+    // Publish the transforms over tf
     geometry_msgs::TransformStamped odom_trans;
     odom_trans.header.stamp = current_time;
-    odom_trans.header.frame_id = "odom_cam";
-    odom_trans.child_frame_id = "base_link_cam";
+    odom_trans.header.frame_id = "odom_refOfcam";
+    odom_trans.child_frame_id = "base_link_refOfcam";
     odom_trans.transform.translation.x = curr_x-cos(DEGTORAD(v[2]))*l;
     odom_trans.transform.translation.y = curr_y-sin(DEGTORAD(v[2]))*l;
     odom_trans.transform.translation.z = 0.0;
@@ -113,22 +111,20 @@ int main(int argc, char **argv)
     // Position of the camera in the reference of the camera
     nav_msgs::Odometry odom;
     odom.header.stamp = current_time;
-    odom.header.frame_id = "odom_cam";
-    odom.child_frame_id = "base_link_cam";
-    //set the position
+    odom.header.frame_id = "pose_Camera_refOfcam";
+    // Set the position
     odom.pose.pose.position.x = v[3];
     odom.pose.pose.position.y = v[4];
     odom.pose.pose.position.z = v[5];
 
     tf::Quaternion quat = tf::createQuaternionFromRPY(
                           DEGTORAD(v[0]), DEGTORAD(v[1]), DEGTORAD(v[2]));
-
+    // Set the attitude
     odom.pose.pose.orientation.x = quat[0];
     odom.pose.pose.orientation.y = quat[1];
     odom.pose.pose.orientation.z = quat[2];
     odom.pose.pose.orientation.w = quat[3];
-    // //set the velocity
-    odom.child_frame_id = "base_link_cam";
+    // Set the velocity
     odom.twist.twist.linear.x = vel_x;
     odom.twist.twist.linear.y = vel_y;
     odom.twist.twist.angular.z = vel_yaw;
@@ -140,8 +136,8 @@ int main(int argc, char **argv)
 
     nav_msgs::Odometry base_link_frame_odom_from_camera;
     base_link_frame_odom_from_camera.header.stamp = current_time;
-    base_link_frame_odom_from_camera.header.frame_id = "odom_cam";
-    base_link_frame_odom_from_camera.child_frame_id = "base_link_cam";
+    base_link_frame_odom_from_camera.header.frame_id = "odom_refOfcam";
+    base_link_frame_odom_from_camera.child_frame_id = "base_link_refOfcam";
     //set the position
     base_link_frame_odom_from_camera.pose.pose.position.x = v[3]-cos(DEGTORAD(v[2]))*l;
     base_link_frame_odom_from_camera.pose.pose.position.y = v[4]-sin(DEGTORAD(v[2]))*l;
@@ -154,7 +150,7 @@ int main(int argc, char **argv)
     base_link_frame_odom_from_camera.pose.pose.orientation.w = q[3];
 
     // set the velocity
-    base_link_frame_odom_from_camera.child_frame_id = "base_link_cam";
+    base_link_frame_odom_from_camera.child_frame_id = "base_link_refOfcam";
     base_link_frame_odom_from_camera.twist.twist.linear.x = pow(pow(vel_x, 2.0) + pow(vel_y, 2.0), 0.5);
     base_link_frame_odom_from_camera.twist.twist.linear.y = 0;
     base_link_frame_odom_from_camera.twist.twist.angular.z = vel_yaw;

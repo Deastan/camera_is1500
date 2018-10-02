@@ -3,4 +3,4 @@ nombre: 0
 # Position of the camera origin in world GPS coordinate frame (UTM)
 originX: 468589.12
 originY: 5264024.62
-rotationAngleCamToUTM: -75.00 # TODO check this value
+rotationAngleCamToUTM: -0.296706 # in rad, TODO check this value
