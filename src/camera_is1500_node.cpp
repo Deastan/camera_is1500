@@ -44,8 +44,8 @@ double last_y = 0;
 double last_yaw = 0;
 double last_vx = 0;
 double last_vyaw = 0;
-tf::Transform transform;
-tf::TransformBroadcaster *tf_broadcaster;
+// tf::Transform transform;
+// tf::TransformBroadcaster *tf_broadcaster;
 
 int main(int argc, char **argv)
 {
