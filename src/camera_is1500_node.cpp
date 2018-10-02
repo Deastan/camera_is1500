@@ -1,5 +1,7 @@
 /*
- * GOAL : is1500 camera data acquisition
+* Camera is1500 data acquisition which publish through ROOS
+* Jonathan Burkhard, Kyburz 2018
+*
 */
 
 #include "ros/ros.h"
@@ -8,46 +10,35 @@
 #include <boost/bind.hpp>
 #include <stdio.h>
 #include <ros/callback_queue.h>
-
-// messages
+// include libraries
 #include <string>
-#include <sensor_msgs/PointCloud.h>
-// #include <nav_msgs/Odometry.msg.h>
-// #include <tf/transform_broadcaster.h>
-#include <nav_msgs/Odometry.h>
-
-// include library
 #include "interface.h"
 #include <cmath>
-// #include <Ei gen/Dense>
+
+// messages
+#include <sensor_msgs/PointCloud.h> //TODO Verifiy if used
+// #include <nav_msgs/Odometry.msg.h>
+// #include <tf/transform_broadcaster.h>
+#include "geometry_msgs/PointStamped.h" //TODO Verifiy if used
+#include <nav_msgs/Odometry.h> //TODO Verifiy if used
 
 // tf1
  #include <tf/tf.h>
  #include <tf/transform_broadcaster.h>
+
 // tf2 transformation
 #include <tf2_ros/buffer.h>
-// #include <tf2/transform_datatypes.h>
-// #include <tf2_sensor_msgs/tf2_sensor_msgs.h>
 #include <tf2_ros/transform_listener.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-
-// // #include <tf2_ros/buffer.h>
-// #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-// #include <geometry_msgs/TransformStamped.h>
-#include "geometry_msgs/PointStamped.h" //TODO VERIFY THIS
-// // #include <buffer.h>
-// #include "tf2_ros/message_filter.h"
-// #include "message_filters/subscriber.h"
-// #include "tf2_geometry_msgs/tf2_geometry_msgs.h"
-// // #include <tf2/LinearMath/Quaternion.h>
-
 
 // Convert radians / degrees
 #define RAD2DEG(rad) ((rad) * 180.0 / 3.1415927)
 #define DEGTORAD(deg) ((deg) / 180.0 * 3.1415927)
 
+double test; // Only here fore test...
 
+// Initialized variable
 double last_x = 0;
 double last_y = 0;
 double last_yaw = 0;
@@ -55,6 +46,7 @@ double last_vx = 0;
 double last_vyaw = 0;
 tf::Transform transform;
 tf::TransformBroadcaster *tf_broadcaster;
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "interface_sfHub_ros_node");
@@ -63,22 +55,20 @@ int main(int argc, char **argv)
   tf2_ros::TransformBroadcaster br;
 
   // Variable init :
-  // Distance between
+  // Distance between center of robot and camera
   float l = 0.835; // [m] in meter
 
   // init. publisher
-  ros::NodeHandle nh;
-  // ros::Publisher track_pub = nh.advertise<sensor_msgs::PointCloud>("track_camera", 1000);
+  ros::NodeHandle nh;//if private param can put that after nh like nh("~");
   ros::Publisher track_pub = nh.advertise<nav_msgs::Odometry>("position_camera_is1500", 1000);
   ros::Publisher odom_track_pub = nh.advertise<nav_msgs::Odometry>("base_link_odom_camera_is1500", 1000);
-  // ros::Publisher odom_track_tf_pub = nh.advertise<nav_msgs::Odometry>("base_link_odom_camera_is1500_TF", 1000);
 
   // Tf2
   tf2_ros::Buffer tfBuffer;
   tf2_ros::TransformListener tfListener(tfBuffer);
 
-
   ros::Rate loop_rate(10);
+
   // Open buffer to take data from the camera,
   // Read sfaccess.ini file and open tracker interface
   if (!overInit())
@@ -86,15 +76,22 @@ int main(int argc, char **argv)
       // std::cout << "Error: Failed to open sfAccess : Could be an issue in camera_is1500_node.cpp or in the interface.cpp (library) "  << std::endl;
       ROS_WARN("Error: Failed to open sfAccess : Could be an issue in camera_is1500_node.cpp or in the interface.cpp (library)");
       return 0;
+  }overClose
+  {
+    ROS_INFO_STREAM("Camera is connected");
   }
-  ROS_INFO_STREAM("Camera is connected");
 
   std::vector<float> v;
   ROS_INFO_STREAM("Geting data from the camera");
   while(nh.ok())
   {
+    // v is a table of float with the data of the IMU of the camera
+    // organised as roll   pitch    yaw   posx   posy   posz
+    // std::cout << v[3] << ", " << v[4] << ", " << v[5] << ", " <<
+    //   v[0] << ", " << v[1] << ", " << v[2] << ", " << std::endl;
     v = overGetData();
-    // velocity
+
+    // Calculation of the velocity
     float curr_x = v[3];
   	float curr_y = v[4];
     ros::Time current_time = ros::Time::now();
@@ -104,7 +101,6 @@ int main(int argc, char **argv)
   	double vel_x = dx/dt; //- last_x)/dt;
     double vel_y = dy/dt;
     double vel_yaw = (v[2] - last_yaw/dt);
-
 
     // ODOM ARE USED in Quaternion  !!!
     // tf::Quaternion q_robot = tf::createQuaternionFromRPY(0, 0, DEGTORAD(v[2]));
@@ -119,52 +115,13 @@ int main(int argc, char **argv)
     odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(DEGTORAD(v[2]));
     br.sendTransform(odom_trans);
 
-    // // float dt = (current_time - last_time).toSec();
-    // geometry_msgs::TransformStamped transformStamped;
-    //
-    // // v is a table of float with the data of the IMU of the camera
-    // // organised as roll   pitch    yaw   posx   posy   posz
-    // // vel_x vel_y vel_z omega_1 omega_2 omega_3
-    //
-    std::cout << v[3] << ", " << v[4] << ", " << v[5] << ", " <<
-      v[0] << ", " << v[1] << ", " << v[2] << ", " << std::endl;
-    //
-    // geometry_msgs::PointStamped base_camera_position;
-    // base_camera_position = geometry_msgs::PointStamped();//TODO unused
-    // base_camera_position.header.frame_id = "base_camera";//TODO unused
-    // base_camera_position.header.stamp = current_time;//TODO unused
-    // base_camera_position.point.x = v[3];//TODO unused
-    // base_camera_position.point.y = v[4];//TODO unused
-    // base_camera_position.point.z = v[5];//TODO unused//TODO unused
+    // test Parameters
+    if(!nh.getParam("/anyName/nombre", test))
+    {
+      ROS_ERROR("Could not find topic parameter : /anyName/nombre");
+    }
+    std::cout << "Le nombre est : " << test << std::endl;
 
-    // try{
-    // // lookupTransform(const std::string &  	target_frame,
-    // // 	const std::string &  	source_frame,
-    // // 	const ros::Time &  	time ) 		const)
-    // //     Parameters:
-    // //     target_frame	The frame to which data should be transformed
-    // //     source_frame	The frame where the data originated time
-    // //     The time at which the value of the transform is desired. (0 will get the latest)
-    // //     Returns:
-    // //     The transform between the frames
-    //   transformStamped = tfBuffer.lookupTransform("base_link", "odom_camera",
-    //                            ros::Time(0));//TODO unused
-    // }
-    // catch (tf2::TransformException &ex) {
-    //   ROS_WARN("%s",ex.what());
-    //   ros::Duration(1.0).sleep();
-    //   continue;
-    // }
-    //
-    // tf2::doTransform(base_camera_position, base_camera_position, transformStamped);//TODO unused
-
-    // std::cout << curr_x << ", " << curr_y << ", " << v[2] << ", " <<
-    //   vel_x << ", " << vel_y << ", " << vel_yaw << ", "  << std::endl;
-
-    // std::cout << v[3] << ", " << v[4] << ", " << v[5] << ", " <<
-    //   v[0] << ", " << v[1] << ", " << v[2] << ", " <<
-    //     v[6] << ", " << v[7] << ", " << v[8] << ", " <<
-    //     v[9] << ", " << v[10] << ", " << v[11] << ", " << std::endl;
     // Position of the camera in the reference of the camera
     nav_msgs::Odometry odom;
     odom.header.stamp = current_time;
@@ -207,31 +164,18 @@ int main(int argc, char **argv)
     base_link_frame_odom_from_camera.pose.pose.orientation.y = q[1];
     base_link_frame_odom_from_camera.pose.pose.orientation.z = q[2];//tf::createQuaternionMsgFromYaw(sin(base_camera_position.point.y/l));
     base_link_frame_odom_from_camera.pose.pose.orientation.w = q[3];
-    //set the velocity
+
+    // set the velocity
     base_link_frame_odom_from_camera.child_frame_id = "base_link_cam";
     base_link_frame_odom_from_camera.twist.twist.linear.x = pow(pow(vel_x, 2.0) + pow(vel_y, 2.0), 0.5);
     base_link_frame_odom_from_camera.twist.twist.linear.y = 0;
     base_link_frame_odom_from_camera.twist.twist.angular.z = vel_yaw;
 
-    // // Transform the camera frame to base_link with tf
-    // nav_msgs::Odometry camera_to_base_link_with_tf;
-    // camera_to_base_link_with_tf.header.stamp = current_time;
-    // camera_to_base_link_with_tf.header.frame_id = "base_link";
-    // //set the position
-    // camera_to_base_link_with_tf.pose.pose.position.x = base_camera_position.point.x;
-    // camera_to_base_link_with_tf.pose.pose.position.y = base_camera_position.point.y;
-    // camera_to_base_link_with_tf.pose.pose.position.z = 0;
-    //
-    // // ODOM ARE USED in quat  !!!
-    // camera_to_base_link_with_tf.pose.pose.orientation.x = 0;
-    // camera_to_base_link_with_tf.pose.pose.orientation.y = 0;
-    // camera_to_base_link_with_tf.pose.pose.orientation.z = q[2];
-    // camera_to_base_link_with_tf.pose.pose.orientation.w = 1;
-
-    //publish the message
+    // Publish the message
     track_pub.publish(odom);
     odom_track_pub.publish(base_link_frame_odom_from_camera);
-    // odom_track_tf_pub.publish(camera_to_base_link_with_tf);
+
+    // Set for next loop
     last_time = ros::Time::now();
   	last_x = curr_x;
   	last_y = curr_y;
@@ -239,7 +183,7 @@ int main(int argc, char **argv)
 
     ros::spinOnce();
     loop_rate.sleep();
-  } // end loop
+  } // end ros-loop
 
   if (!overClose())
   {
@@ -250,7 +194,7 @@ int main(int argc, char **argv)
   {
     ROS_INFO_STREAM("sfAccess is closed");
   }
+
   ROS_INFO_STREAM("End of the node : camera_is1500_node");
-  // std::cout << "End of the node : camera_is1500_node" << std::endl;
   return 0;
 } // end main

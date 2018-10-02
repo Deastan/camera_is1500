@@ -1,7 +1,10 @@
 <launch>
     <node name="anyName" pkg="camera_is1500" type="camera_is1500" output="screen">
       <!-- <remap from="base_link_odom_camera_is1500" to="odom"/>   -->
+      <rosparam command= "load"
+        file="/home/jonathan/catkin_ws_kyb/src/camera_is1500/param/config.yaml"/>
     </node>
+    <!-- file="$(find package)/param/config.yaml"/> -->
     <!-- transformation between camera and base_link -->
     <!-- <node pkg="tf2_ros" type="static_transform_publisher"
       name="base_camera_broadcaster"
