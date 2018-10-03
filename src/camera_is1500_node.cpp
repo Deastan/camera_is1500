@@ -40,7 +40,7 @@ double test; // Only here fore test...
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "interface_sfHub_ros_node");
+  ros::init(argc, argv, "interface_sfHub_ros");
   ros::start();
   ros::Time last_time;
   tf2_ros::TransformBroadcaster br;
@@ -58,6 +58,22 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;//if private param can put that after nh like nh("~");
   ros::Publisher track_pub = nh.advertise<nav_msgs::Odometry>("position_camera_is1500", 1000);
   ros::Publisher odom_track_pub = nh.advertise<nav_msgs::Odometry>("base_link_odom_camera_is1500", 1000);
+
+  double originX;
+  if(!nh.getParam("/camera_is1500_node/originX", originX))
+  {
+    ROS_ERROR("Could not find topic parameter : /camera_is1500_node/originX");
+  }
+  double originY;
+  if(!nh.getParam("/camera_is1500_node/originY", originY))
+  {
+    ROS_ERROR("Could not find topic parameter : /camera_is1500_node/originY");
+  }
+  double rotationAngleCamToUTM;
+  if(!nh.getParam("/camera_is1500_node/rotationAngleCamToUTM", rotationAngleCamToUTM))
+  {
+    ROS_ERROR("Could not find topic parameter : /camera_is1500_node/rotationAngleCamToUTM");
+  }
 
   // Tf2
   tf2_ros::Buffer tfBuffer;
@@ -107,6 +123,30 @@ int main(int argc, char **argv)
     odom_trans.transform.translation.z = 0.0;
     odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(DEGTORAD(v[2]));
     br.sendTransform(odom_trans);
+
+    // // replace odom if needed
+    // geometry_msgs::TransformStamped odom_trans;
+    // odom_trans.header.stamp = current_time;
+    // odom_trans.header.frame_id = "odom";
+    // odom_trans.child_frame_id = "base_link";
+    // odom_trans.transform.translation.x = curr_x-cos(DEGTORAD(v[2]))*l;
+    // odom_trans.transform.translation.y = curr_y-sin(DEGTORAD(v[2]))*l;
+    // odom_trans.transform.translation.z = 0.0;
+    // odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(DEGTORAD(v[2]));
+    // br.sendTransform(odom_trans);
+
+    double centerRobotPoseX = curr_x-cos(DEGTORAD(v[2]))*l;
+    double centerRobotPoseY = curr_y-sin(DEGTORAD(v[2]))*l;
+    // In GPS coordinates
+    geometry_msgs::TransformStamped odom_trans2;
+    odom_trans2.header.stamp = current_time;
+    odom_trans2.header.frame_id = "odom_refOfcam";
+    odom_trans2.child_frame_id = "base_link_refOfcam";
+    odom_trans2.transform.translation.x = centerRobotPoseX * cos(rotationAngleCamToUTM) + centerRobotPoseY * cos(1.57079632679 - rotationAngleCamToUTM) - 65.88;
+    odom_trans2.transform.translation.y = centerRobotPoseX * sin(rotationAngleCamToUTM) + centerRobotPoseY * sin(1.57079632679 - rotationAngleCamToUTM) - 55.38;
+    odom_trans2.transform.translation.z = 0.0;
+    odom_trans2.transform.rotation = tf::createQuaternionMsgFromYaw(DEGTORAD(v[2]) + rotationAngleCamToUTM);
+    br.sendTransform(odom_trans2);
 
     // Position of the camera in the reference of the camera
     nav_msgs::Odometry odom;

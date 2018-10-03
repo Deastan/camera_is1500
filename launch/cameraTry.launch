@@ -1,5 +1,5 @@
 <launch>
-    <node name="anyName" pkg="camera_is1500" type="camera_is1500" output="screen">
+    <node name="camera_is1500_node" pkg="camera_is1500" type="camera_is1500" output="screen">
       <!-- <remap from="base_link_odom_camera_is1500" to="odom"/>   -->
       <rosparam command= "load"
         file="/home/jonathan/catkin_ws_kyb/src/camera_is1500/param/config.yaml"/>
