@@ -1,6 +1,6 @@
 # For test in the code
 nombre: 0
 # Position of the camera origin in world GPS coordinate frame (UTM)
-originX: 468589.12
-originY: 5264024.62
+originX: 468589.12 #-65.88 # [m] #468589.12
+originY: 5264024.62 #-55.38 # [m] #5264024.62
 rotationAngleCamToUTM: -0.296706 # in rad, TODO check this value

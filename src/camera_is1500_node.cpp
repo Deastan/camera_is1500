@@ -51,7 +51,7 @@ int main(int argc, char **argv)
   double last_yaw = 0;
   double last_vx = 0;
   double last_vyaw = 0;
-  // Distance between center of robot and camera
+  // Distance between center of the robot and the camera
   float l = 0.835; // [m] in meter
 
   // init. publisher
@@ -132,7 +132,6 @@ int main(int argc, char **argv)
     // Transform the position of the camera to base_link manually
     // Create this quaternion from roll/pitch/yaw (in radians)
     tf::Quaternion q = tf::createQuaternionFromRPY(0, 0, DEGTORAD(v[2]));
-
 
     nav_msgs::Odometry base_link_frame_odom_from_camera;
     base_link_frame_odom_from_camera.header.stamp = current_time;
