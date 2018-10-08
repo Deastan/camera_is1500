@@ -51,8 +51,7 @@ int main(int argc, char **argv)
   double last_yaw = 0;
   double last_vx = 0;
   double last_vyaw = 0;
-  // Distance between center of the robot and the camera
-  float l = 0.835; // [m] in meter
+
 
   // init. publisher
   ros::NodeHandle nh;//if private param can put that after nh like nh("~");
@@ -73,6 +72,11 @@ int main(int argc, char **argv)
   if(!nh.getParam("/camera_is1500_node/rotationAngleCamToUTM", rotationAngleCamToUTM))
   {
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/rotationAngleCamToUTM");
+  }
+  double l = 0.83.5; // [m] in meter // Distance between center of the robot and the camera
+  if(!nh.getParam("/camera_is1500_node/l_camera_x", l))
+  {
+    ROS_ERROR("Could not find topic parameter : /camera_is1500_node/l_camera_x");
   }
 
   // Tf2

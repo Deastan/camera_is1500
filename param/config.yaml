@@ -4,3 +4,4 @@ nombre: 0
 originX: 468589.12 #-65.88 # [m] #468589.12
 originY: 5264024.62 #-55.38 # [m] #5264024.62
 rotationAngleCamToUTM: -0.296706 # in rad, TODO check this value
+l_camera_x: 0.85 #here for et1 #distance of the camera with the center of the robot
