@@ -99,10 +99,9 @@ int main(int argc, char **argv)
   {
     // v is a table of float with the data of the IMU of the camera
     // organised as roll   pitch    yaw   posx   posy   posz
+    v = overGetData();
     // std::cout << v[3] << ", " << v[4] << ", " << v[5] << ", " <<
     //   v[0] << ", " << v[1] << ", " << v[2] << ", " << std::endl;
-    v = overGetData();
-
     // Calculation of the velocity
     float curr_x = v[3];
   	float curr_y = v[4];
@@ -141,8 +140,8 @@ int main(int argc, char **argv)
     // In GPS coordinates
     geometry_msgs::TransformStamped odom_trans2;
     odom_trans2.header.stamp = current_time;
-    odom_trans2.header.frame_id = "odom_refOfcam";
-    odom_trans2.child_frame_id = "base_link_refOfcam";
+    odom_trans2.header.frame_id = "odom";
+    odom_trans2.child_frame_id = "base_link";
     odom_trans2.transform.translation.x = centerRobotPoseX * cos(rotationAngleCamToUTM) + centerRobotPoseY * cos(1.57079632679 - rotationAngleCamToUTM) - 65.88;
     odom_trans2.transform.translation.y = centerRobotPoseX * sin(rotationAngleCamToUTM) + centerRobotPoseY * sin(1.57079632679 - rotationAngleCamToUTM) - 55.38;
     odom_trans2.transform.translation.z = 0.0;
