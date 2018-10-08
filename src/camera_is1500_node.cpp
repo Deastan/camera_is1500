@@ -102,6 +102,7 @@ int main(int argc, char **argv)
     v = overGetData();
     // std::cout << v[3] << ", " << v[4] << ", " << v[5] << ", " <<
     //   v[0] << ", " << v[1] << ", " << v[2] << ", " << std::endl;
+    
     // Calculation of the velocity
     float curr_x = v[3];
   	float curr_y = v[4];
