@@ -1,7 +1,8 @@
 /*
 * Camera is1500 data acquisition which publish through ROOS
 * Jonathan Burkhard, Kyburz 2018
-*
+* Documentations :
+* https://docs.google.com/document/d/1PqNxtafhbULaRYPs3b4RwIS-OikPkcjWYqzIcSp_Swk/edit?usp=sharing
 */
 
 #include "ros/ros.h"
@@ -16,10 +17,6 @@
 #include <cmath>
 
 // messages
-// #include <sensor_msgs/PointCloud.h> //TODO Verifiy if used
-// #include <nav_msgs/Odometry.msg.h>
-// #include <tf/transform_broadcaster.h>
-// #include "geometry_msgs/PointStamped.h" //TODO Verifiy if used
 #include <nav_msgs/Odometry.h>
 
 // tf1
