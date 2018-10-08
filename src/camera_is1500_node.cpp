@@ -73,7 +73,7 @@ int main(int argc, char **argv)
   {
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/rotationAngleCamToUTM");
   }
-  double l = 0.83.5; // [m] in meter // Distance between center of the robot and the camera
+  double l = 0.835; // [m] in meter // Distance between center of the robot and the camera
   if(!nh.getParam("/camera_is1500_node/l_camera_x", l))
   {
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/l_camera_x");
@@ -225,11 +225,3 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("End of the node : camera_is1500_node");
   return 0;
 } // end main
-
-
-// test get pearameters
-// if(!nh.getParam("/anyName/nombre", test))
-// {
-//   ROS_ERROR("Could not find topic parameter : /anyName/nombre");
-// }
-// // std::cout << "Le nombre est : " << test << std::endl;
