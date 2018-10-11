@@ -102,7 +102,7 @@ int main(int argc, char **argv)
     v = overGetData();
     // std::cout << v[3] << ", " << v[4] << ", " << v[5] << ", " <<
     //   v[0] << ", " << v[1] << ", " << v[2] << ", " << std::endl;
-    
+
     // Calculation of the velocity
     float curr_x = v[3];
   	float curr_y = v[4];
@@ -117,8 +117,8 @@ int main(int argc, char **argv)
     // Publish the transforms over tf
     geometry_msgs::TransformStamped odom_trans;
     odom_trans.header.stamp = current_time;
-    odom_trans.header.frame_id = "odom_refOfcam";
-    odom_trans.child_frame_id = "base_link_refOfcam";
+    odom_trans.header.frame_id = "odom";
+    odom_trans.child_frame_id = "base_link";
     odom_trans.transform.translation.x = curr_x-cos(DEGTORAD(v[2]))*l;
     odom_trans.transform.translation.y = curr_y-sin(DEGTORAD(v[2]))*l;
     odom_trans.transform.translation.z = 0.0;
@@ -176,8 +176,8 @@ int main(int argc, char **argv)
 
     nav_msgs::Odometry base_link_frame_odom_from_camera;
     base_link_frame_odom_from_camera.header.stamp = current_time;
-    base_link_frame_odom_from_camera.header.frame_id = "odom_refOfcam";
-    base_link_frame_odom_from_camera.child_frame_id = "base_link_refOfcam";
+    base_link_frame_odom_from_camera.header.frame_id = "odom";
+    base_link_frame_odom_from_camera.child_frame_id = "base_link";
     //set the position
     base_link_frame_odom_from_camera.pose.pose.position.x = v[3]-cos(DEGTORAD(v[2]))*l;
     base_link_frame_odom_from_camera.pose.pose.position.y = v[4]-sin(DEGTORAD(v[2]))*l;
@@ -190,7 +190,7 @@ int main(int argc, char **argv)
     base_link_frame_odom_from_camera.pose.pose.orientation.w = q[3];
 
     // set the velocity
-    base_link_frame_odom_from_camera.child_frame_id = "base_link_refOfcam";
+    base_link_frame_odom_from_camera.child_frame_id = "base_link";
     base_link_frame_odom_from_camera.twist.twist.linear.x = pow(pow(vel_x, 2.0) + pow(vel_y, 2.0), 0.5);
     base_link_frame_odom_from_camera.twist.twist.linear.y = 0;
     base_link_frame_odom_from_camera.twist.twist.angular.z = vel_yaw;
