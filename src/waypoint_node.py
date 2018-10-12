@@ -10,11 +10,12 @@ import numpy as np
 
 from geometry_msgs.msg import Quaternion, Point, Pose, Twist, Vector3
 from std_msgs.msg import Empty, Float32
+from nav_msgs.msg import Odometry
 from math import radians, pow
 import tf.transformations
 # from std_msgs.msg import Empty
 from std_msgs.msg import String
-
+import math
 # Usefull function
 def dotproduct(v1, v2):
   return sum((a*b) for a, b in zip(v1, v2))
@@ -42,20 +43,44 @@ motorpub = rospy.Publisher('/motor_state', String, queue_size=100)
 global mot_pub
 mot_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=100)
 global mot_msg
+# Global variable..
+global ready_to_go
+ready_to_go = rospy.set_param('/waypoint_node/ready_to_go', False)#
+global success
+success = rospy.set_param('/waypoint_node/success', False)#
+global target_x
+target_x = rospy.set_param('/waypoint_node/target_x', 3.7)
+global target_y
+target_y = rospy.set_param('/waypoint_node/target_y', -1.5)
+
 
 def turning_callback(msg):
-    global state
+    print("Enter in callback")
+    # Re-assignement inside func
+    global ready_to_go
+    global success
+    global target_x
+    global target_y
+
+    global mot_msg
+    mot_msg= Twist()
+
+    ready_to_go = rospy.get_param('/waypoint_node/ready_to_go')
+    success = rospy.get_param('/waypoint_node/success')
+    target_x = rospy.get_param('/waypoint_node/target_x')
+    target_y = rospy.get_param('/waypoint_node/target_y')
+
 
     robot_x = msg.pose.pose.position.x
     robot_y = msg.pose.pose.position.y
     (roll, pitch, yaw) = tf.transformations.euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
     yaw = -yaw
-
-    if(ready_to_go == True and success == False):
+    if(ready_to_go == 1):# and success == 0):
+        print("Enter first cond")
         u = [np.cos(yaw), np.sin(yaw)] # direction of the robot
         v = [robot_x - target_x, robot_y - target_y] # vector btw robot and target
         err_angle = angle(u, v)
-        err_x = length(u, v)
+        err_x = length(v)
         # err_Y = u[1]-v[1]
         if(np.abs(err_angle) > 0.05): # envi 2.9 deg
             if(err_angle < 0):
@@ -143,10 +168,7 @@ def turning_callback(msg):
 #     start_time=time.time()
 
 def run():
-    self.ready_to_go = rospy.get_param('~ready_to_go', False)#
-    self.success = rospy.get_param('~success', False)#
-    self.target_x = rospy.get_param('~target_x', 3.7)
-    self.target_y = rospy.get_param('~target_x', -1.5)
+
 
     start_time = time.time()
     rospy.loginfo("Waypoint starting up")
@@ -154,6 +176,8 @@ def run():
     #basic program code
 
     rospy.init_node('Waypoint')
+
+
 
     rospy.Subscriber("/base_link_odom_camera_is1500", Odometry, turning_callback)
 
@@ -163,10 +187,10 @@ def run():
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
-    timer.shutdown()
+    # timer.shutdown()
 
 if __name__ == '__main__':
     try:
         run()
     except rospy.ROSInterruptException:
-pass
+        pass

@@ -153,7 +153,7 @@ install(DIRECTORY launch/
 install(PROGRAMS
    src/waypoint_node.py
 
-   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/nodes
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/src
  )
 
 
