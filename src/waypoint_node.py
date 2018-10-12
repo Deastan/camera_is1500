@@ -75,7 +75,7 @@ def turning_callback(msg):
     robot_y = msg.pose.pose.position.y
     (roll, pitch, yaw) = tf.transformations.euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
     yaw = -yaw
-    if(ready_to_go == 1):# and success == 0):
+    if(ready_to_go == 1 and success == 0):
         print("Enter first cond")
         u = [np.cos(yaw), np.sin(yaw)] # direction of the robot
         v = [robot_x - target_x, robot_y - target_y] # vector btw robot and target
@@ -91,9 +91,20 @@ def turning_callback(msg):
                 print("err_angle > 0")
         else:
             mot_msg.angular.z = 0.0
-            success = True
-            ready_to_go = False
-            print("Successful mission")
+            
+            print("Successful mission : angle")
+
+        if(np.abs(err_x) > 0.05): # envi 2.9 deg
+            if(err_x > 0):
+                mot_msg.linear.x = 0.25
+                print("err_x > 0, Should go forward")
+            else:
+                mot_msg.linear.x = -0.25
+                print("err_x < 0, Should go backward")
+        else:
+            mot_msg.linear.x = 0.0
+
+            print("Successful mission : distance")
         mot_pub.publish(mot_msg)
 
 
