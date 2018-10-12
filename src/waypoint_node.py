@@ -49,7 +49,7 @@ ready_to_go = rospy.set_param('/waypoint_node/ready_to_go', False)#
 global success
 success = rospy.set_param('/waypoint_node/success', False)#
 global target_x
-target_x = rospy.set_param('/waypoint_node/target_x', 3.7)
+target_x = rospy.set_param('/waypoint_node/target_x', 1.0)
 global target_y
 target_y = rospy.set_param('/waypoint_node/target_y', -1.5)
 
@@ -83,29 +83,29 @@ def turning_callback(msg):
         err_angle = angle - yaw#angle(u, v)
 
         err_x = length(v)
-        print("Err_anle : ", err_angle, "Err_x : ", err_x)
+        print("Err_anle : ", err_angle, "Err_x : ", err_x, '\n', "Robot position : (", robot_x, ", ", robot_y, ") ")
         # err_Y = u[1]-v[1]
-        if(np.abs(err_angle) > 0.1 and np.abs(err_x) > 0.2): # envi 2*2.9 deg
-            if(err_angle < 0):
-                mot_msg.angular.z =  1.0
+        if(np.abs(err_angle) > 0.2 and np.abs(err_x) > 0.4): # envi 2*2.9 deg
+            if(err_angle < 0 or err_angle > 3.1457):
+                mot_msg.angular.z =  0.6
                 mot_msg.linear.x = 0.0
                 mot_msg.linear.y = 0.0
-                print("turn left")
-            else:
-                mot_msg.angular.z = - 1.0
+                #print("turn left")
+            elif err_angle > 0 or err_angle > -3.1457:
+                mot_msg.angular.z = - 0.6
                 mot_msg.linear.x = 0.0
                 mot_msg.linear.y = 0.0
-                print("turn right")
+                #print("turn right")
         else:
             mot_msg.angular.z = 0.0
 
-            print("Successful mission : angle")
+            #print("Successful mission : angle")
 
-            if(np.abs(err_x) > 0.1): # envi 2.9 deg
+            if(np.abs(err_x) > 0.2): # envi 2.9 deg
                 if(err_x > 0):
-                    mot_msg.linear.x = 0.5
+                    mot_msg.linear.x = 0.4
                     mot_msg.linear.y = 0.0
-                    print("err_x > 0, Should go forward")
+            #        print("err_x > 0, Should go forward")
                 #else:
                 #    mot_msg.linear.x = -0.5
                 #    mot_msg.linear.y = 0.0
@@ -115,9 +115,13 @@ def turning_callback(msg):
                 mot_msg.linear.y = 0.0
                 mot_msg.angular.z = 0.0
                 ready_to_go = False
-                success = True
-                print("Successful mission : distance")
-        mot_pub.publish(mot_msg)
+                #success = True
+                print("Successful mission !")
+    else:
+        mot_msg.linear.x = 0.0
+        mot_msg.linear.y = 0.0
+        mot_msg.angular.z = 0.0
+    mot_pub.publish(mot_msg)
 
 
     #publish a twist command for the motor
