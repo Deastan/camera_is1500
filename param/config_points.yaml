@@ -1,0 +1,3 @@
+# Position of the camera origin in world GPS coordinate frame (UTM)
+Point_x: 2 #-65.88 # [m] #468589.12
+Point_y: -1,5 #-55.38 # [m] #5264024.62
