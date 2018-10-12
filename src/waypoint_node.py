@@ -29,11 +29,11 @@ def unit_vector(vector):
     """ Returns the unit vector of the vector.  """
     return vector / np.linalg.norm(vector)
 
-def angle(v1, v2):
-    """ Returns the angle in radians between vectors 'v1' and 'v2'::  """
-    v1_u = unit_vector(v1)
-    v2_u = unit_vector(v2)
-    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+#def angle(v1, v2):
+#    """ Returns the angle in radians between vectors 'v1' and 'v2'::  """
+#    v1_u = unit_vector(v1)
+#    v2_u = unit_vector(v2)
+#    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
 
 #Publish directly what we need for the motor
@@ -55,7 +55,7 @@ target_y = rospy.set_param('/waypoint_node/target_y', -1.5)
 
 
 def turning_callback(msg):
-    print("Enter in callback")
+    #print("Enter in callback")
     # Re-assignement inside func
     global ready_to_go
     global success
@@ -74,37 +74,49 @@ def turning_callback(msg):
     robot_x = msg.pose.pose.position.x
     robot_y = msg.pose.pose.position.y
     (roll, pitch, yaw) = tf.transformations.euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
-    yaw = -yaw
+    #yaw = -yaw
     if(ready_to_go == 1 and success == 0):
-        print("Enter first cond")
+        #print("Enter first cond")
         u = [np.cos(yaw), np.sin(yaw)] # direction of the robot
-        v = [robot_x - target_x, robot_y - target_y] # vector btw robot and target
-        err_angle = angle(u, v)
+        v = [target_x -robot_x, target_y - robot_y] # vector btw robot and target
+        angle = np.arctan2(v[1], v[0])
+        err_angle = angle - yaw#angle(u, v)
+
         err_x = length(v)
+        print("Err_anle : ", err_angle, "Err_x : ", err_x)
         # err_Y = u[1]-v[1]
-        if(np.abs(err_angle) > 0.05): # envi 2.9 deg
+        if(np.abs(err_angle) > 0.1 and np.abs(err_x) > 0.2): # envi 2*2.9 deg
             if(err_angle < 0):
-                mot_msg.angular.z = 0.5
-                print("err_angle < 0")
+                mot_msg.angular.z =  1.0
+                mot_msg.linear.x = 0.0
+                mot_msg.linear.y = 0.0
+                print("turn left")
             else:
-                mot_msg.angular.z = - 0.5
-                print("err_angle > 0")
+                mot_msg.angular.z = - 1.0
+                mot_msg.linear.x = 0.0
+                mot_msg.linear.y = 0.0
+                print("turn right")
         else:
             mot_msg.angular.z = 0.0
-            
+
             print("Successful mission : angle")
 
-        if(np.abs(err_x) > 0.05): # envi 2.9 deg
-            if(err_x > 0):
-                mot_msg.linear.x = 0.25
-                print("err_x > 0, Should go forward")
+            if(np.abs(err_x) > 0.1): # envi 2.9 deg
+                if(err_x > 0):
+                    mot_msg.linear.x = 0.5
+                    mot_msg.linear.y = 0.0
+                    print("err_x > 0, Should go forward")
+                #else:
+                #    mot_msg.linear.x = -0.5
+                #    mot_msg.linear.y = 0.0
+                #    print("err_x < 0, Should go backward")
             else:
-                mot_msg.linear.x = -0.25
-                print("err_x < 0, Should go backward")
-        else:
-            mot_msg.linear.x = 0.0
-
-            print("Successful mission : distance")
+                mot_msg.linear.x = 0.0
+                mot_msg.linear.y = 0.0
+                mot_msg.angular.z = 0.0
+                ready_to_go = False
+                success = True
+                print("Successful mission : distance")
         mot_pub.publish(mot_msg)
 
 
@@ -205,3 +217,10 @@ if __name__ == '__main__':
         run()
     except rospy.ROSInterruptException:
         pass
+    mot_msg.linear.x = 0.0
+    mot_msg.linear.y = 0.0
+    mot_msg.angular.z = 0.0
+    ready_to_go = False
+    success = True
+    print("end")
+    mot_pub.publish(mot_msg)
