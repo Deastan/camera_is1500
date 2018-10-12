@@ -11,10 +11,28 @@ import numpy as np
 from geometry_msgs.msg import Quaternion, Point, Pose, Twist, Vector3
 from std_msgs.msg import Empty, Float32
 from math import radians, pow
-
 import tf.transformations
 # from std_msgs.msg import Empty
 from std_msgs.msg import String
+
+# Usefull function
+def dotproduct(v1, v2):
+  return sum((a*b) for a, b in zip(v1, v2))
+def length(v):
+  return math.sqrt(dotproduct(v, v))
+# error if angle = 0 or pi
+# def angle(v1, v2):
+#   return math.acos(dotproduct(v1, v2) / (length(v1) * length(v2)))
+
+def unit_vector(vector):
+    """ Returns the unit vector of the vector.  """
+    return vector / np.linalg.norm(vector)
+
+def angle(v1, v2):
+    """ Returns the angle in radians between vectors 'v1' and 'v2'::  """
+    v1_u = unit_vector(v1)
+    v2_u = unit_vector(v2)
+    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
 
 #Publish directly what we need for the motor
@@ -28,14 +46,37 @@ global mot_msg
 def turning_callback(msg):
     global state
 
-    if()
+    robot_x = msg.pose.pose.position.x
+    robot_y = msg.pose.pose.position.y
+    (roll, pitch, yaw) = tf.transformations.euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
+    yaw = -yaw
+
+    if(ready_to_go == True and success == False):
+        u = [np.cos(yaw), np.sin(yaw)] # direction of the robot
+        v = [robot_x - target_x, robot_y - target_y] # vector btw robot and target
+        err_angle = angle(u, v)
+        err_x = length(u, v)
+        # err_Y = u[1]-v[1]
+        if(np.abs(err_angle) > 0.05): # envi 2.9 deg
+            if(err_angle < 0):
+                mot_msg.angular.z = 0.5
+                print("err_angle < 0")
+            else:
+                mot_msg.angular.z = - 0.5
+                print("err_angle > 0")
+        else:
+            mot_msg.angular.z = 0.0
+            success = True
+            ready_to_go = False
+            print("Successful mission")
+        mot_pub.publish(mot_msg)
 
 
-    publish a twist command for the motor
-    mot_msg.linear.x = 0.25
-    mot_msg.linear.y = 0
-    mot_msg.angular.z = 1
-    mot_pub.publish(mot_msg)
+    #publish a twist command for the motor
+    # mot_msg.linear.x = 0.25
+    # mot_msg.linear.y = 0
+    # mot_msg.angular.z = 1
+    # mot_pub.publish(mot_msg)
     #rospy.loginfo("Received a /cmd_vel message!")
     #rospy.loginfo("Linear Components: [%f, %f, %f]"%(msg.linear.x, msg.linear.y, msg.linear.z))
     #rospy.loginfo("Angular Components: [%f, %f, %f]"%(msg.angular.x, msg.angular.y, msg.angular.z))
@@ -102,7 +143,8 @@ def turning_callback(msg):
 #     start_time=time.time()
 
 def run():
-    self.ready_to_go = rospy.get_param('~ready_to_go', False)# We won't the one from the GPS neither wheel_odom
+    self.ready_to_go = rospy.get_param('~ready_to_go', False)#
+    self.success = rospy.get_param('~success', False)#
     self.target_x = rospy.get_param('~target_x', 3.7)
     self.target_y = rospy.get_param('~target_x', -1.5)
 
