@@ -15,6 +15,9 @@
 #include <string>
 #include "interface.h"
 #include <cmath>
+#include <vector>
+#include <numeric>
+
 
 // messages
 #include <nav_msgs/Odometry.h>
@@ -33,6 +36,23 @@
 #define RAD2DEG(rad) ((rad) * 180.0 / 3.1415927)
 #define DEGTORAD(deg) ((deg) / 180.0 * 3.1415927)
 
+// TODO Check if I did the right calculation
+double compute_variance(std::vector<double> v)
+{
+  double sum = std::accumulate(v.begin(), v.end(), 0.0);
+  double mean = sum / v.size();
+
+  std::vector<double> diff(v.size());
+  std::transform(v.begin(), v.end(), diff.begin(),
+                 std::bind2nd(std::minus<double>(), mean));
+
+  // for standard deviation
+  double sq_sum = std::inner_product(diff.begin(), diff.end(), diff.begin(), 0.0);
+  // double stdev = std::sqrt(sq_sum / v.size());
+  return (sq_sum / v.size());
+}
+
+
 double test; // Only here fore test...
 
 int main(int argc, char **argv)
@@ -43,18 +63,30 @@ int main(int argc, char **argv)
   tf2_ros::TransformBroadcaster br;
 
   // Variables initialization :
+  // velocity
   double last_x = 0;
   double last_y = 0;
   double last_yaw = 0;
   double last_vx = 0;
   double last_vyaw = 0;
-
+  // Variances and Covariances
+  int size_var = 60;
+  std::vector<double> x_vec(size_var, 0.0);
+  std::vector<double> y_vec(size_var, 0.0);
+  // double x_vec[size_var] = {};
+  double TWIST_COVAR [6][6] = {{0.0001, 0, 0, 0, 0, 0},
+                 {0, 0.0001, 0, 0, 0, 0},
+                 {0, 0, 0.0001, 0, 0, 0},
+                 {0, 0, 0, 0.0001, 0, 0},
+                 {0, 0, 0, 0, 0.0001, 0},
+                 {0, 0, 0, 0, 0, 0.0001}};
 
   // init. publisher
   ros::NodeHandle nh;//if private param can put that after nh like nh("~");
   ros::Publisher track_pub = nh.advertise<nav_msgs::Odometry>("position_camera_is1500", 1000);
   ros::Publisher odom_track_pub = nh.advertise<nav_msgs::Odometry>("base_link_odom_camera_is1500", 1000);
 
+  // Get parameters
   double originX;
   if(!nh.getParam("/camera_is1500_node/originX", originX))
   {
@@ -97,6 +129,7 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("Geting data from the camera");
   while(nh.ok())
   {
+
     // v is a table of float with the data of the IMU of the camera
     // organised as roll   pitch    yaw   posx   posy   posz
     v = overGetData();
@@ -194,6 +227,22 @@ int main(int argc, char **argv)
     base_link_frame_odom_from_camera.twist.twist.linear.x = pow(pow(vel_x, 2.0) + pow(vel_y, 2.0), 0.5);
     base_link_frame_odom_from_camera.twist.twist.linear.y = 0;
     base_link_frame_odom_from_camera.twist.twist.angular.z = vel_yaw;
+
+    // x_vec.insert(0, 5.2);
+    // std::cout << "Size before:" << x_vec.size() << std::endl;
+    x_vec.insert(x_vec.begin(), base_link_frame_odom_from_camera.pose.pose.position.x);
+    y_vec.insert(y_vec.begin(), base_link_frame_odom_from_camera.pose.pose.position.y);
+    // compute_variance(x_vec);
+
+    // double average = (static_cast<double>(std::accumulate(x_vec.begin(), x_vec.end(), 0))/ x_vec.size());
+    // std::cout << "Size middle:" << x_vec.size() << std::endl;
+    x_vec.pop_back();
+    y_vec.pop_back();
+    std::cout << "variance of x :" << compute_variance(x_vec) << "variance of y :" << compute_variance(y_vec) << std::endl;
+    // std::cout << "Size end:" << x_vec.size() << std::endl;
+
+    // std::cout << x_vec[0] << x_vec[59] << std::endl;
+
 
     // Publish the message
     track_pub.publish(odom);
