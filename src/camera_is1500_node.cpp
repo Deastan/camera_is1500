@@ -228,21 +228,18 @@ int main(int argc, char **argv)
     base_link_frame_odom_from_camera.twist.twist.linear.y = 0;
     base_link_frame_odom_from_camera.twist.twist.angular.z = vel_yaw;
 
-    // x_vec.insert(0, 5.2);
-    // std::cout << "Size before:" << x_vec.size() << std::endl;
+    // Insert last 60 position in array of position x, y
     x_vec.insert(x_vec.begin(), base_link_frame_odom_from_camera.pose.pose.position.x);
     y_vec.insert(y_vec.begin(), base_link_frame_odom_from_camera.pose.pose.position.y);
-    // compute_variance(x_vec);
-
-    // double average = (static_cast<double>(std::accumulate(x_vec.begin(), x_vec.end(), 0))/ x_vec.size());
-    // std::cout << "Size middle:" << x_vec.size() << std::endl;
+    // remove the oldest line
     x_vec.pop_back();
     y_vec.pop_back();
-    std::cout << "variance of x :" << compute_variance(x_vec) << "variance of y :" << compute_variance(y_vec) << std::endl;
-    // std::cout << "Size end:" << x_vec.size() << std::endl;
+    // std::cout << "variance of x :" << compute_variance(x_vec) << "variance of y :" << compute_variance(y_vec) << std::endl;
+    // Add covariance to message
+    base_link_frame_odom_from_camera.pose.covariance[21] = compute_variance(x_vec);
+    base_link_frame_odom_from_camera.pose.covariance[28] = compute_variance(y_vec);
 
-    // std::cout << x_vec[0] << x_vec[59] << std::endl;
-
+    // base_link_frame_odom_from_camera.twist.covariance = TWIST_COVAR;
 
     // Publish the message
     track_pub.publish(odom);
