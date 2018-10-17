@@ -107,6 +107,11 @@ int main(int argc, char **argv)
   {
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/l_camera_x");
   }
+  double angleOfset;
+  if(!nh.getParam("/camera_is1500_node/angleOfset", angleOfset))
+  {
+    ROS_ERROR("Could not find topic parameter : /camera_is1500_node/angleOfset");
+  }
 
   // Tf2
   tf2_ros::Buffer tfBuffer;
@@ -139,23 +144,25 @@ int main(int argc, char **argv)
     // Calculation of the velocity
     float curr_x = v[3];
   	float curr_y = v[4];
+    double yaw = v[2] - angleOfset; // in deg
+    // std::cout << v[2] << ", " << yaw << ", " << std::endl;
     ros::Time current_time = ros::Time::now();
   	float dx = (curr_x - last_x);
   	float dy = (curr_y - last_y);
   	double dt = (current_time - last_time).toSec();
   	double vel_x = dx/dt; //- last_x)/dt;
     double vel_y = dy/dt;
-    double vel_yaw = (v[2] - last_yaw/dt);
+    double vel_yaw = (yaw - last_yaw/dt);
 
     // Publish the transforms over tf
     geometry_msgs::TransformStamped odom_trans;
     odom_trans.header.stamp = current_time;
     odom_trans.header.frame_id = "odom";
     odom_trans.child_frame_id = "base_link";
-    odom_trans.transform.translation.x = curr_x-cos(DEGTORAD(v[2]))*l;
-    odom_trans.transform.translation.y = curr_y-sin(DEGTORAD(v[2]))*l;
+    odom_trans.transform.translation.x = curr_x-cos(DEGTORAD(yaw))*l;
+    odom_trans.transform.translation.y = curr_y-sin(DEGTORAD(yaw))*l;
     odom_trans.transform.translation.z = 0.0;
-    odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(DEGTORAD(v[2]));
+    odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(DEGTORAD(yaw));
     br.sendTransform(odom_trans);
 
     // // replace odom if needed
@@ -169,8 +176,8 @@ int main(int argc, char **argv)
     // odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(DEGTORAD(v[2]));
     // br.sendTransform(odom_trans);
 
-    double centerRobotPoseX = curr_x-cos(DEGTORAD(v[2]))*l;
-    double centerRobotPoseY = curr_y-sin(DEGTORAD(v[2]))*l;
+    double centerRobotPoseX = curr_x-cos(DEGTORAD(yaw))*l;
+    double centerRobotPoseY = curr_y-sin(DEGTORAD(yaw))*l;
     // In GPS coordinates
     //geometry_msgs::TransformStamped odom_trans2;
     //odom_trans2.header.stamp = current_time;
@@ -192,7 +199,7 @@ int main(int argc, char **argv)
     odom.pose.pose.position.z = v[5];
 
     tf::Quaternion quat = tf::createQuaternionFromRPY(
-                          DEGTORAD(v[0]), DEGTORAD(v[1]), DEGTORAD(v[2]));
+                          DEGTORAD(v[0]), DEGTORAD(v[1]), DEGTORAD(yaw));
     // Set the attitude
     odom.pose.pose.orientation.x = quat[0];
     odom.pose.pose.orientation.y = quat[1];
@@ -205,15 +212,15 @@ int main(int argc, char **argv)
 
     // Transform the position of the camera to base_link manually
     // Create this quaternion from roll/pitch/yaw (in radians)
-    tf::Quaternion q = tf::createQuaternionFromRPY(0, 0, DEGTORAD(v[2]));
+    tf::Quaternion q = tf::createQuaternionFromRPY(0, 0, DEGTORAD(yaw));
 
     nav_msgs::Odometry base_link_frame_odom_from_camera;
     base_link_frame_odom_from_camera.header.stamp = current_time;
     base_link_frame_odom_from_camera.header.frame_id = "odom";
     base_link_frame_odom_from_camera.child_frame_id = "base_link";
     //set the position
-    base_link_frame_odom_from_camera.pose.pose.position.x = v[3]-cos(DEGTORAD(v[2]))*l;
-    base_link_frame_odom_from_camera.pose.pose.position.y = v[4]-sin(DEGTORAD(v[2]))*l;
+    base_link_frame_odom_from_camera.pose.pose.position.x = v[3]-cos(DEGTORAD(yaw))*l;
+    base_link_frame_odom_from_camera.pose.pose.position.y = v[4]-sin(DEGTORAD(yaw))*l;
     base_link_frame_odom_from_camera.pose.pose.position.z = 0;
 
     // ODOM ARE USED in quat  !!!
@@ -249,7 +256,7 @@ int main(int argc, char **argv)
     last_time = ros::Time::now();
   	last_x = curr_x;
   	last_y = curr_y;
-    last_yaw = v[2];
+    last_yaw = yaw;
 
     ros::spinOnce();
     loop_rate.sleep();
