@@ -20,3 +20,5 @@
 #include <nav_msgs/Odometry.h>
 #include <std_msgs/Float64.h>
 #include <trajectory_msgs/MultiDOFJointTrajectory.h>
+
+bool changeMap(int numberMap);

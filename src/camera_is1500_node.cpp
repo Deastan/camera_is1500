@@ -7,6 +7,10 @@
 
 #include "ros/ros.h"
 #include <sstream>
+// #include <filesystem>
+// #include <experimental/filesystem>
+#include <fstream>
+
 #include <ros/console.h>
 #include <boost/bind.hpp>
 #include <stdio.h>
@@ -52,9 +56,31 @@ double compute_variance(std::vector<double> v)
   return (sq_sum / v.size());
 }
 
+// Change the map in sfHub
+// 1 = hangar
+// 2 = ...
+// TODO : Restart sfHub
+void changeMap(int numberMap)
+{
+  std::ifstream  src("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/hangarscaled/environmentPSEs.cfg", std::ios::binary);
+  if(numberMap == 1)
+  {
+    std::ifstream  src("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/hangarscaled/environmentPSEs.cfg", std::ios::binary);
+  }else
+  {
+    ROS_INFO("Default map");
+  }
+    std::ofstream  dst("/home/jonathan/Desktop/environmentPSEs.cfg",   std::ios::binary);
+
+    dst << src.rdbuf();
+  // return true;
+}
 
 double test; // Only here fore test...
 
+//******************************************************************************
+//  MAIN
+//******************************************************************************
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "interface_sfHub_ros");
@@ -112,6 +138,15 @@ int main(int argc, char **argv)
   {
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/angleOfset");
   }
+  int mapNumber = 0;
+  int lastMapNumber = -1;
+  if(!nh.getParam("/camera_is1500_node/mapNumber", mapNumber))
+  {
+    ROS_ERROR("Could not find topic parameter : /camera_is1500_node/mapNumber");
+  }
+
+
+
 
   // Tf2
   tf2_ros::Buffer tfBuffer;
@@ -132,8 +167,21 @@ int main(int argc, char **argv)
 
   std::vector<float> v;
   ROS_INFO_STREAM("Geting data from the camera");
+//******************************************************************************
+//  Loop
+//******************************************************************************
   while(nh.ok())
   {
+    // load map
+    nh.getParam("/camera_is1500_node/mapNumber", mapNumber);
+    if(mapNumber != lastMapNumber)
+    {
+      changeMap(mapNumber);
+      std::cout << "Map number "<< mapNumber << " is loaded from " << lastMapNumber << std::endl;
+      lastMapNumber = mapNumber;
+
+    }
+
 
     // v is a table of float with the data of the IMU of the camera
     // organised as roll   pitch    yaw   posx   posy   posz
