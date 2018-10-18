@@ -67,17 +67,17 @@ double compute_variance(std::vector<double> v)
 void changeMap(int numberMap)
 {
   system("gnome-terminal -x sh -c 'pkill sfHub'");
-  std::ifstream  src("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/hangarscaled/environmentPSEs.cfg", std::ios::binary);
+  std::ifstream  src("/home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/hangarscaled/environmentPSEs.cfg", std::ios::binary);
   if(numberMap == 1)
   {
-    std::ifstream  src("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/hangarscaled/environmentPSEs.cfg", std::ios::binary);
+    std::ifstream  src("/home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/hangarscaled/environmentPSEs.cfg", std::ios::binary);
   }else
   {
     ROS_INFO("Default map set");
   }
-    std::ofstream  dst("/home/jonathan/Desktop/environmentPSEs.cfg",   std::ios::binary);
+    std::ofstream  dst("/home/ew/Desktop/environmentPSEs.cfg",   std::ios::binary);
     dst << src.rdbuf();
-    system("gnome-terminal -x sh -c 'cd && cd /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
+    system("gnome-terminal -x sh -c 'cd && cd /home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
   // return true;
 }
 
