@@ -59,6 +59,7 @@ double compute_variance(std::vector<double> v)
 // TODO : Restart sfHub
 void changeMap(int numberMap)
 {
+  system("gnome-terminal -x sh -c 'pkill sfHub'");
   std::ifstream  src("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/hangarscaled/environmentPSEs.cfg", std::ios::binary);
   if(numberMap == 1)
   {
@@ -69,6 +70,7 @@ void changeMap(int numberMap)
   }
     std::ofstream  dst("/home/jonathan/Desktop/environmentPSEs.cfg",   std::ios::binary);
     dst << src.rdbuf();
+    system("gnome-terminal -x sh -c 'cd && cd /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
   // return true;
 }
 
@@ -77,6 +79,11 @@ void changeMap(int numberMap)
 //******************************************************************************
 int main(int argc, char **argv)
 {
+  // system("gnome-terminal -e 'sh cd /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub && ./sfHub\"'");
+  // system("cd && cd /home/jonathan/catkin_ws_kyb/src/camera_is1500/src/ && ./scriptSHub.bash");
+  // system("gnome-terminal -x sh -c 'cd && cd /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
+  // system("gnome-terminal -x sh -c 'pkill sfHub'");
+  // pkill <name_of_program>
   ros::init(argc, argv, "interface_sfHub_ros");
   ros::start();
   ros::Time last_time;
