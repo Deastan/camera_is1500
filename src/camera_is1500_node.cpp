@@ -58,6 +58,7 @@ double compute_variance(std::vector<double> v)
 // 1 = hangar
 // 2 = ...
 // TODO write it for real system
+// TODO perhaps it create a suscriber to a message to receive a command with new map and not from ros param
 void changeMap(int numberMap)
 {
   system("gnome-terminal -x sh -c 'pkill sfHub'");
