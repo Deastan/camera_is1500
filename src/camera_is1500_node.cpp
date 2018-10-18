@@ -54,9 +54,10 @@ double compute_variance(std::vector<double> v)
 }
 
 // Change the map in sfHub
+// close sfHub and re-run sfHub with new changed map
 // 1 = hangar
 // 2 = ...
-// TODO : Restart sfHub
+// TODO write it for real system
 void changeMap(int numberMap)
 {
   system("gnome-terminal -x sh -c 'pkill sfHub'");
@@ -66,7 +67,7 @@ void changeMap(int numberMap)
     std::ifstream  src("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/hangarscaled/environmentPSEs.cfg", std::ios::binary);
   }else
   {
-    ROS_INFO("Default map");
+    ROS_INFO("Default map set");
   }
     std::ofstream  dst("/home/jonathan/Desktop/environmentPSEs.cfg",   std::ios::binary);
     dst << src.rdbuf();
@@ -79,11 +80,6 @@ void changeMap(int numberMap)
 //******************************************************************************
 int main(int argc, char **argv)
 {
-  // system("gnome-terminal -e 'sh cd /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub && ./sfHub\"'");
-  // system("cd && cd /home/jonathan/catkin_ws_kyb/src/camera_is1500/src/ && ./scriptSHub.bash");
-  // system("gnome-terminal -x sh -c 'cd && cd /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
-  // system("gnome-terminal -x sh -c 'pkill sfHub'");
-  // pkill <name_of_program>
   ros::init(argc, argv, "interface_sfHub_ros");
   ros::start();
   ros::Time last_time;
@@ -175,7 +171,8 @@ int main(int argc, char **argv)
     if(mapNumber != lastMapNumber)
     {
       changeMap(mapNumber);
-      std::cout << "Map number "<< mapNumber << " is loaded from " << lastMapNumber << std::endl;
+      ROS_INFO("New map set");
+      // std::cout << "Map number "<< mapNumber << " is loaded from " << lastMapNumber << std::endl;
       lastMapNumber = mapNumber;
     }
 
