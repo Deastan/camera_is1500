@@ -5,6 +5,11 @@
 * https://docs.google.com/document/d/1PqNxtafhbULaRYPs3b4RwIS-OikPkcjWYqzIcSp_Swk/edit?usp=sharing
 */
 
+// TODO
+// - Write a file config for placement of the map file and sfHub
+// - Write a script for building interface library with right .ini setting
+// - Clean the code with function, private variables etc...
+
 #include "ros/ros.h"
 #include <sstream>
 #include <fstream>
