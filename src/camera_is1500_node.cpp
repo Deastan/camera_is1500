@@ -71,7 +71,6 @@ void changeMap(int numberMap)
     ROS_INFO("Default map");
   }
     std::ofstream  dst("/home/jonathan/Desktop/environmentPSEs.cfg",   std::ios::binary);
-
     dst << src.rdbuf();
   // return true;
 }
@@ -144,8 +143,6 @@ int main(int argc, char **argv)
   {
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/mapNumber");
   }
-
-
 
 
   // Tf2
