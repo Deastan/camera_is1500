@@ -48,7 +48,7 @@ global motor_pub
 motorpub = rospy.Publisher('/motor_state', String, queue_size=100)
 
 global mot_pub
-mot_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=100)
+mot_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
 global mot_msg
 # Global variable..
 global ready_to_go
@@ -56,15 +56,13 @@ ready_to_go = rospy.set_param('/waypoint_node/ready_to_go', False)#
 global success
 success = rospy.set_param('/waypoint_node/success', False)#
 global target
-target = rospy.set_param('/waypoint_node/target', [3.7, -1.5])
-
+#target = rospy.set_param('/waypoint_node/target', [3.7, -1.5])
+target = rospy.set_param('/waypoint_node/target', [3.7, -6.0])
 
 def turning_callback(msg):
     # Re-assignement inside func
     global ready_to_go
     global success
-    global target_x
-    global target_y
     global target
 
     global mot_msg
@@ -72,8 +70,6 @@ def turning_callback(msg):
 
     ready_to_go = rospy.get_param('/waypoint_node/ready_to_go')
     success = rospy.get_param('/waypoint_node/success')
-    target_x = rospy.get_param('/waypoint_node/target_x')
-    target_y = rospy.get_param('/waypoint_node/target_y')
     target = rospy.get_param('/waypoint_node/target')
 
 
@@ -89,9 +85,9 @@ def turning_callback(msg):
         err_angle = angle - yaw#angle(u, v)
 
         err_x = length(v)
-        print("Err_anle : ", err_angle, "Err_x : ", err_x, '\n', "Robot position : (", robot_x, ", ", robot_y, ") ")
+        print("Err_angle : ", err_angle, "Err_x : ", err_x, '\n', "Robot position : (", robot_x, ", ", robot_y, ") ")
         # err_Y = u[1]-v[1]
-        if(np.abs(err_angle) > 0.2 and np.abs(err_x) > 0.4): # envi 2*2.9 deg
+        if(np.abs(err_angle) > 0.3 and np.abs(err_x) > 0.2): # envi 2*2.9 deg
             if(err_angle < 0 or err_angle > 3.1457):
                 mot_msg.angular.z =  0.6
                 mot_msg.linear.x = 0.0
@@ -109,7 +105,7 @@ def turning_callback(msg):
 
             if(np.abs(err_x) > 0.2): # envi 2.9 deg
                 if(err_x > 0):
-                    mot_msg.linear.x = 0.4
+                    mot_msg.linear.x = 0.35
                     mot_msg.linear.y = 0.0
             #        print("err_x > 0, Should go forward")
                 #else:
@@ -121,8 +117,15 @@ def turning_callback(msg):
                 mot_msg.linear.y = 0.0
                 mot_msg.angular.z = 0.0
                 ready_to_go = False
+                mot_msg.linear.x = 0.0
+                mot_msg.linear.y = 0.0
+                mot_msg.angular.z = 0.0
+                mot_pub.publish(mot_msg)
+                rospy.set_param('/waypoint_node/ready_to_go', False)
                 #success = True
                 print("Successful mission !")
+                #rospy.init_node('Waypoint', disable_signals=True)
+                rospy.signal_shutdown('Quit')
     else:
         mot_msg.linear.x = 0.0
         mot_msg.linear.y = 0.0
