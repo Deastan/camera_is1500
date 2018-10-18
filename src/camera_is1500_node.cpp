@@ -7,8 +7,6 @@
 
 #include "ros/ros.h"
 #include <sstream>
-// #include <filesystem>
-// #include <experimental/filesystem>
 #include <fstream>
 
 #include <ros/console.h>
@@ -21,7 +19,6 @@
 #include <cmath>
 #include <vector>
 #include <numeric>
-
 
 // messages
 #include <nav_msgs/Odometry.h>
@@ -74,8 +71,6 @@ void changeMap(int numberMap)
     dst << src.rdbuf();
   // return true;
 }
-
-double test; // Only here fore test...
 
 //******************************************************************************
 //  MAIN
@@ -144,7 +139,6 @@ int main(int argc, char **argv)
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/mapNumber");
   }
 
-
   // Tf2
   tf2_ros::Buffer tfBuffer;
   tf2_ros::TransformListener tfListener(tfBuffer);
@@ -176,9 +170,7 @@ int main(int argc, char **argv)
       changeMap(mapNumber);
       std::cout << "Map number "<< mapNumber << " is loaded from " << lastMapNumber << std::endl;
       lastMapNumber = mapNumber;
-
     }
-
 
     // v is a table of float with the data of the IMU of the camera
     // organised as roll   pitch    yaw   posx   posy   posz
@@ -199,13 +191,16 @@ int main(int argc, char **argv)
     double vel_y = dy/dt;
     double vel_yaw = (yaw - last_yaw/dt);
 
+    double centerRobotPoseX = curr_x - cos(DEGTORAD(yaw))*l;
+    double centerRobotPoseY = curr_y - sin(DEGTORAD(yaw))*l;
+
     // Publish the transforms over tf
     geometry_msgs::TransformStamped odom_trans;
     odom_trans.header.stamp = current_time;
     odom_trans.header.frame_id = "odom";
     odom_trans.child_frame_id = "base_link";
-    odom_trans.transform.translation.x = curr_x-cos(DEGTORAD(yaw))*l;
-    odom_trans.transform.translation.y = curr_y-sin(DEGTORAD(yaw))*l;
+    odom_trans.transform.translation.x = centerRobotPoseX;
+    odom_trans.transform.translation.y = centerRobotPoseY;
     odom_trans.transform.translation.z = 0.0;
     odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(DEGTORAD(yaw));
     br.sendTransform(odom_trans);
@@ -221,8 +216,6 @@ int main(int argc, char **argv)
     // odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(DEGTORAD(v[2]));
     // br.sendTransform(odom_trans);
 
-    double centerRobotPoseX = curr_x-cos(DEGTORAD(yaw))*l;
-    double centerRobotPoseY = curr_y-sin(DEGTORAD(yaw))*l;
     // In GPS coordinates
     //geometry_msgs::TransformStamped odom_trans2;
     //odom_trans2.header.stamp = current_time;
@@ -287,6 +280,7 @@ int main(int argc, char **argv)
     x_vec.pop_back();
     y_vec.pop_back();
     // std::cout << "variance of x :" << compute_variance(x_vec) << "variance of y :" << compute_variance(y_vec) << std::endl;
+
     // Add covariance to message
     base_link_frame_odom_from_camera.pose.covariance[21] = compute_variance(x_vec);
     base_link_frame_odom_from_camera.pose.covariance[28] = compute_variance(y_vec);
