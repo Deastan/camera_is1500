@@ -37,12 +37,9 @@ def unit_vector(vector):
     """ Returns the unit vector of the vector.  """
     return vector / np.linalg.norm(vector)
 
-global motor_pub# Publish directly what we need for the motor
-motorpub = rospy.Publisher('/motor_state', String, queue_size = 1)
-
 global mot_pub
 mot_pub = rospy.Publisher('/cmd_vel', Twist, queue_size = 1) # 100 to 1
-global mot_msg
+global mot_msg # Contain the msg
 
 global ready_to_go
 ready_to_go = rospy.set_param('/waypoint_node/ready_to_go', False)#
