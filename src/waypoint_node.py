@@ -46,8 +46,8 @@ ready_to_go = rospy.set_param('/waypoint_node/ready_to_go', False)#
 global success
 success = rospy.set_param('/waypoint_node/success', False)#
 global target
-#target = rospy.set_param('/waypoint_node/target', [3.7,-1.5])
-target = rospy.set_param('/waypoint_node/target', [3.7,-6.0])
+target = rospy.set_param('/waypoint_node/target', [3.7,-1.5])
+#target = rospy.set_param('/waypoint_node/target', [3.7,-6.0])
 
 def turning_callback(msg):
     # Re-assignement inside func
@@ -75,7 +75,7 @@ def turning_callback(msg):
 
         # First change the angle to have the point in front of the robot and
         # after move forward
-        if(np.abs(err_angle) > 0.3 and np.abs(err_x) > 0.2): # envi 2*2.9 deg
+        if(np.abs(err_angle) > 0.25 and np.abs(err_x) > 0.2): # envi 2*2.9 deg
             if(err_angle < 0 or err_angle > 3.1457):
                 mot_msg.angular.z =  0.6
                 mot_msg.linear.x = 0.0
