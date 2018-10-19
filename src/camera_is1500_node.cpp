@@ -112,8 +112,8 @@ int main(int argc, char **argv)
 
   // init. publisher
   ros::NodeHandle nh;//if private param can put that after nh like nh("~");
-  ros::Publisher track_pub = nh.advertise<nav_msgs::Odometry>("position_camera_is1500", 1000);
-  ros::Publisher odom_track_pub = nh.advertise<nav_msgs::Odometry>("base_link_odom_camera_is1500", 1000);
+  ros::Publisher track_pub = nh.advertise<nav_msgs::Odometry>("position_camera_is1500", 1);//10000 to 1
+  ros::Publisher odom_track_pub = nh.advertise<nav_msgs::Odometry>("base_link_odom_camera_is1500", 1); //1000 to 1
 
   // Get parameters
   double originX;

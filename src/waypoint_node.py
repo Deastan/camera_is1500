@@ -45,10 +45,10 @@ def unit_vector(vector):
 
 # Publish directly what we need for the motor
 global motor_pub
-motorpub = rospy.Publisher('/motor_state', String, queue_size=100)
+motorpub = rospy.Publisher('/motor_state', String, queue_size=1)
 
 global mot_pub
-mot_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
+mot_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1) # 100 to 1 
 global mot_msg
 # Global variable..
 global ready_to_go
