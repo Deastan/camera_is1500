@@ -75,7 +75,7 @@ void changeMap(int numberMap)
   {
     ROS_INFO("Default map set");
   }
-    std::ofstream  dst("/home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/environmentPSEs.cfg",   std::ios::binary);
+    std::ofstream  dst("/home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/S1/environmentPSEs.cfg",   std::ios::binary);
     dst << src.rdbuf();
     system("gnome-terminal -x sh -c 'cd && cd /home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
   // return true;
