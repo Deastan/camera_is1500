@@ -7,8 +7,9 @@ originY: 5264024.62 #-55.38 # [m] #5264024.62
 rotationAngleCamToUTM: -0.296706 # in rad, TODO check this value
 # Placement of the camera in x-axis
 # Assumption : only change in x direction
-l_camera_x: 0.85 #here for et1 #distance of the camera with the center of the robot
+l_camera_x: 0.85 # here for et1 #distance of the camera from the center of the robot in x-axis
+l_camera_y: 0.0 # distance of the camera from the center of the robot in y-axis
 # Angle offset between x-axis and the camera
-angleOfset: 0.0
+angleOfset: 0.0 #can be removed
 # Number of the needed map
 mapNumber: 1

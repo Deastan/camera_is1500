@@ -21,6 +21,7 @@
 // include libraries
 #include <string>
 #include "interface.h"
+// #include <math.h>
 #include <cmath>
 #include <vector>
 #include <numeric>
@@ -131,11 +132,20 @@ int main(int argc, char **argv)
   {
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/rotationAngleCamToUTM");
   }
-  double l = 0.835; // [m] in meter // Distance between center of the robot and the camera
-  if(!nh.getParam("/camera_is1500_node/l_camera_x", l))
+  double l_x; // [m] in meter // Distance between center of the robot and the camera
+  if(!nh.getParam("/camera_is1500_node/l_camera_x", l_x))
   {
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/l_camera_x");
+    l_x = 0.835; // set default value
   }
+  double l_y; // [m] in meter // Distance between center of the robot and the camera
+  if(!nh.getParam("/camera_is1500_node/l_camera_y", l_y))
+  {
+    ROS_ERROR("Could not find topic parameter : /camera_is1500_node/l_camera_y");
+    l_y = 0; // set default value
+  }
+  double l = sqrt(pow(l_x,2) + pow(l_y, 2));
+
   double angleOfset;
   if(!nh.getParam("/camera_is1500_node/angleOfset", angleOfset))
   {
@@ -191,7 +201,9 @@ int main(int argc, char **argv)
     // Calculation of the velocity
     float curr_x = v[3];
   	float curr_y = v[4];
-    double yaw = v[2] + angleOfset; // in deg
+    double yaw_cam = v[2]; // in deg
+    double yaw =  v[2] - RAD2DEG(atan2(l_y,l_x)); //in deg
+    std::cout << "Yaw : " << yaw << std::endl;
     // std::cout << v[2] << ", " << yaw << ", " << std::endl;
     ros::Time current_time = ros::Time::now();
   	float dx = (curr_x - last_x);
@@ -201,8 +213,8 @@ int main(int argc, char **argv)
     double vel_y = dy/dt;
     double vel_yaw = (yaw - last_yaw/dt);
 
-    double centerRobotPoseX = curr_x - cos(DEGTORAD(yaw))*l;
-    double centerRobotPoseY = curr_y - sin(DEGTORAD(yaw))*l;
+    double centerRobotPoseX = curr_x - cos(DEGTORAD(yaw_cam))*l;
+    double centerRobotPoseY = curr_y - sin(DEGTORAD(yaw_cam))*l;
 
     // Publish the transforms over tf
     geometry_msgs::TransformStamped odom_trans;
