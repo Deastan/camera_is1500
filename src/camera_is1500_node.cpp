@@ -68,17 +68,17 @@ double compute_variance(std::vector<double> v)
 void changeMap(int numberMap)
 {
   system("gnome-terminal -x sh -c 'pkill sfHub'");
-  std::ifstream  src("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_Hangar_outside_Friday_1/environmentPSEs.cfg", std::ios::binary);
+  std::ifstream  src("/home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_hangar_outside_monday_1/environmentPSEs.cfg", std::ios::binary);
   if(numberMap == 1)
   {
-    std::ifstream  src("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_Hangar_outside_Friday_1/environmentPSEs.cfg", std::ios::binary);
+    std::ifstream  src("/home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_hangar_outside_monday_1/environmentPSEs.cfg", std::ios::binary);
   }else
   {
     ROS_INFO("Default map set");
   }
-    std::ofstream  dst("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/S1/environmentPSEs.cfg",   std::ios::binary);
+    std::ofstream  dst("/home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/S1/environmentPSEs.cfg",   std::ios::binary);
     dst << src.rdbuf();
-    system("gnome-terminal -x sh -c 'cd && cd /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
+    system("gnome-terminal -x sh -c 'cd && cd /home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
   // return true;
 }
 
@@ -202,7 +202,7 @@ int main(int argc, char **argv)
     float curr_x = v[3];
   	float curr_y = v[4];
     double yaw_cam = v[2]; // in deg
-    double yaw =  v[2] - RAD2DEG(atan2(l_y,l_x)); //in deg
+    double yaw =  v[2];// - RAD2DEG(atan2(l_y,l_x)); //in deg
     // std::cout << "Yaw : " << yaw << std::endl;
     // std::cout << v[2] << ", " << yaw << ", " << std::endl;
     ros::Time current_time = ros::Time::now();

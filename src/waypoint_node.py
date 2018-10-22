@@ -46,7 +46,7 @@ ready_to_go = rospy.set_param('/waypoint_node/ready_to_go', False)#
 global success
 success = rospy.set_param('/waypoint_node/success', False)#
 global target
-target = rospy.set_param('/waypoint_node/target', [1.5,1])
+target = rospy.set_param('/waypoint_node/target', [1.5,1.5])
 #target = rospy.set_param('/waypoint_node/target', [3.7,-6.0])
 
 def turning_callback(msg):
@@ -64,14 +64,17 @@ def turning_callback(msg):
     robot_x = msg.pose.pose.position.x
     robot_y = msg.pose.pose.position.y
     (roll, pitch, yaw) = tf.transformations.euler_from_quaternion([msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w])
-
+    u = [np.cos(yaw), np.sin(yaw)] # direction of the robot
+    v = [target[0] -robot_x, target[1] - robot_y] # vector btw robot and target
+    angle = np.arctan2(v[1], v[0])
+    err_angle = angle - yaw # angle(u, v)
+    err_x = length(v) # distance btw robot un target
+    #print(yaw, ', angle: ', angle, ', error angle: ', err_angle)
+    print("Err_angle : ", err_angle, "Err_x : ", err_x, '\n', "Robot position : (", robot_x, ", ", robot_y, ") ")
     if(ready_to_go == 1 and success == 0): # Success is not used yet...
-        u = [np.cos(yaw), np.sin(yaw)] # direction of the robot
-        v = [target[0] -robot_x, target[1] - robot_y] # vector btw robot and target
-        angle = np.arctan2(v[1], v[0])
-        err_angle = angle - yaw # angle(u, v)
-        err_x = length(v) # distance btw robot un target
-        print("Err_angle : ", err_angle, "Err_x : ", err_x, '\n', "Robot position : (", robot_x, ", ", robot_y, ") ")
+
+
+        #print("Err_angle : ", err_angle, "Err_x : ", err_x, '\n', "Robot position : (", robot_x, ", ", robot_y, ") ")
 
         # First change the angle to have the point in front of the robot and
         # after move forward
