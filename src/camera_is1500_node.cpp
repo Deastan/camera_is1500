@@ -203,7 +203,7 @@ int main(int argc, char **argv)
   	float curr_y = v[4];
     double yaw_cam = v[2]; // in deg
     double yaw =  v[2] - RAD2DEG(atan2(l_y,l_x)); //in deg
-    std::cout << "Yaw : " << yaw << std::endl;
+    // std::cout << "Yaw : " << yaw << std::endl;
     // std::cout << v[2] << ", " << yaw << ", " << std::endl;
     ros::Time current_time = ros::Time::now();
   	float dx = (curr_x - last_x);
@@ -259,7 +259,7 @@ int main(int argc, char **argv)
     odom.pose.pose.position.z = v[5];
 
     tf::Quaternion quat = tf::createQuaternionFromRPY(
-                          DEGTORAD(v[0]), DEGTORAD(v[1]), DEGTORAD(yaw));
+                          DEGTORAD(v[0]), DEGTORAD(v[1]), DEGTORAD(v[2]));
     // Set the attitude
     odom.pose.pose.orientation.x = quat[0];
     odom.pose.pose.orientation.y = quat[1];
@@ -279,8 +279,8 @@ int main(int argc, char **argv)
     base_link_frame_odom_from_camera.header.frame_id = "odom";
     base_link_frame_odom_from_camera.child_frame_id = "base_link";
     //set the position
-    base_link_frame_odom_from_camera.pose.pose.position.x = v[3]-cos(DEGTORAD(yaw))*l;
-    base_link_frame_odom_from_camera.pose.pose.position.y = v[4]-sin(DEGTORAD(yaw))*l;
+    base_link_frame_odom_from_camera.pose.pose.position.x = centerRobotPoseX;
+    base_link_frame_odom_from_camera.pose.pose.position.y = centerRobotPoseY;
     base_link_frame_odom_from_camera.pose.pose.position.z = 0;
 
     // ODOM ARE USED in quat  !!!
