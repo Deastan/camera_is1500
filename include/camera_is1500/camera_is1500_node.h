@@ -1,24 +1,39 @@
-#include <Eigen/Eigen>
+#include "ros/ros.h"
+#include <sstream>
+#include <fstream>
+
+#include <ros/console.h>
 #include <boost/bind.hpp>
 #include <stdio.h>
-
-// ros
 #include <ros/callback_queue.h>
-#include <ros/ros.h>
+// include libraries
+#include <string>
+#include "interface.h"
+// #include <math.h>
+#include <cmath>
+#include <vector>
+#include <numeric>
 
-#include "overactuated_control/bicopter_controller.h"
-#include "rotors_control/common.h"
-#include "rotors_control/parameters_ros.h"
-
-// msgs
-#include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/WrenchStamped.h>
-#include <mav_msgs/Actuators.h>
-#include <mav_msgs/AttitudeThrust.h>
-#include <mav_msgs/default_topics.h>
-#include <mav_msgs/eigen_mav_msgs.h>
+// messages
 #include <nav_msgs/Odometry.h>
-#include <std_msgs/Float64.h>
-#include <trajectory_msgs/MultiDOFJointTrajectory.h>
 
-bool changeMap(int numberMap);
+// tf1
+ #include <tf/tf.h>
+ #include <tf/transform_broadcaster.h>
+
+// tf2 transformation
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_ros/transform_broadcaster.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+
+// Convert radians / degrees
+#define RAD2DEG(rad) ((rad) * 180.0 / 3.1415927)
+#define DEGTORAD(deg) ((deg) / 180.0 * 3.1415927)
+
+void init(ros::NodeHandle nh);
+void changeMap(ros::NodeHandle nh, int &numberMap, int &lastMapNumber,
+  std::vector<string> tableMapPathsArg);
+void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
+  ros::Publisher odom_track_pub, ros::Time &last_time,
+  tf2_ros::TransformBroadcaster br);

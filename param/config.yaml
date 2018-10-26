@@ -1,20 +1,19 @@
 # Config file for camera_is1500_node
 # Attention to set the right parameter here
 
-# Position of the camera origin in world GPS coordinate frame (UTM)
-originX: 468589.12 #-65.88 # [m] #468589.12
-originY: 5264024.62 #-55.38 # [m] #5264024.62
-rotationAngleCamToUTM: -0.296706 # in rad, TODO check this value
+
 # Placement of the camera in x-axis
 # Assumption : only change in x direction
 l_camera_x: 0.85 # here for et1 #distance of the camera from the center of the robot in x-axis
 l_camera_y: 0.0 # distance of the camera from the center of the robot in y-axis
 
 # Number of the needed map
-mapNumber: -1
+mapNumber: 0
 # 0: back_hangar_outside_monday_1
 # 1: back_Hangar_outside_Friday_1
-tableMapPaths: [/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_hangar_outside_monday_1/environmentPSEs.cfg, /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_Hangar_outside_Friday_1/environmentPSEs.cfg]
+tableMapPaths: [/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_hangar_outside_monday_1/environmentPSEs.cfg,
+  /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_Hangar_outside_Friday_1/environmentPSEs.cfg]
+# Position of the camera origin in world GPS coordinate frame (UTM)
 tableOriginX: [468589.12, 0.0]
 tableOriginY: [5264024.62, 0.0]
 tableRotationAngleCamToUTM: [-0.296706, 0.0]
