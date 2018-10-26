@@ -5,7 +5,7 @@
 * https://docs.google.com/document/d/1PqNxtafhbULaRYPs3b4RwIS-OikPkcjWYqzIcSp_Swk/edit?usp=sharing
 */
 
-// TODO
+// TODO:
 // - Write a file config for placement of the map file and sfHub
 // - Write a script for building interface library with right .ini setting
 // - Clean the code with function, private variables etc...
@@ -68,17 +68,17 @@ double compute_variance(std::vector<double> v)
 void changeMap(int numberMap)
 {
   system("gnome-terminal -x sh -c 'pkill sfHub'");
-  std::ifstream  src("/home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_hangar_outside_monday_1/environmentPSEs.cfg", std::ios::binary);
+  std::ifstream  src("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_hangar_outside_monday_1/environmentPSEs.cfg", std::ios::binary);
   if(numberMap == 1)
   {
-    std::ifstream  src("/home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_hangar_outside_monday_1/environmentPSEs.cfg", std::ios::binary);
+    std::ifstream  src("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_hangar_outside_monday_1/environmentPSEs.cfg", std::ios::binary);
   }else
   {
     ROS_INFO("Default map set");
   }
-    std::ofstream  dst("/home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/S1/environmentPSEs.cfg",   std::ios::binary);
+    std::ofstream  dst("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/S1/environmentPSEs.cfg",   std::ios::binary);
     dst << src.rdbuf();
-    system("gnome-terminal -x sh -c 'cd && cd /home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
+    system("gnome-terminal -x sh -c 'cd && cd /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
   // return true;
 }
 
@@ -88,6 +88,8 @@ void changeMap(int numberMap)
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "interface_sfHub_ros");
+    // Open sfHub
+    system("gnome-terminal -x sh -c 'cd && cd /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
   ros::start();
   ros::Time last_time;
   tf2_ros::TransformBroadcaster br;
@@ -117,12 +119,12 @@ int main(int argc, char **argv)
   ros::Publisher odom_track_pub = nh.advertise<nav_msgs::Odometry>("base_link_odom_camera_is1500", 1); //1000 to 1
 
   // Get parameters
-  double originX;
+  double originX; // GPS
   if(!nh.getParam("/camera_is1500_node/originX", originX))
   {
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/originX");
   }
-  double originY;
+  double originY; // GPS
   if(!nh.getParam("/camera_is1500_node/originY", originY))
   {
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/originY");
@@ -144,13 +146,9 @@ int main(int argc, char **argv)
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/l_camera_y");
     l_y = 0; // set default value
   }
-  double l = sqrt(pow(l_x,2) + pow(l_y, 2));
+  double l = sqrt(pow(l_x,2) + pow(l_y, 2)); // distance btw camera and robot center
+  double angle_camPos_robotCenter = RAD2DEG(atan2(l_y,l_x)); //in deg
 
-  double angleOfset;
-  if(!nh.getParam("/camera_is1500_node/angleOfset", angleOfset))
-  {
-    ROS_ERROR("Could not find topic parameter : /camera_is1500_node/angleOfset");
-  }
   int mapNumber = 0;
   int lastMapNumber = -1;
   if(!nh.getParam("/camera_is1500_node/mapNumber", mapNumber))
@@ -202,9 +200,9 @@ int main(int argc, char **argv)
     float curr_x = v[3];
   	float curr_y = v[4];
     double yaw_cam = v[2]; // in deg
-    double yaw =  v[2];// - RAD2DEG(atan2(l_y,l_x)); //in deg
+    double yaw =  v[2] - angle_camPos_robotCenter;// - RAD2DEG(atan2(l_y,l_x)); //in deg
     // std::cout << "Yaw : " << yaw << std::endl;
-    // std::cout << v[2] << ", " << yaw << ", " << std::endl;
+    // std::cout << "angle from Camera: " << yaw_cam << ", yaw: " << yaw << ", camAngle: " << cam_position_angle << std::endl;
     ros::Time current_time = ros::Time::now();
   	float dx = (curr_x - last_x);
   	float dy = (curr_y - last_y);
@@ -325,7 +323,6 @@ int main(int argc, char **argv)
 
   if (!overClose())
   {
-      // std::cout << "Error: Failed to open sfAccess : Could be an issue in camera_is1500_node.cpp or in the interface.cpp (library) "  << std::endl;
       ROS_WARN("Failed to close sfAccess");
       return 0;
   }else

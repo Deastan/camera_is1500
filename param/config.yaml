@@ -9,7 +9,12 @@ rotationAngleCamToUTM: -0.296706 # in rad, TODO check this value
 # Assumption : only change in x direction
 l_camera_x: 0.85 # here for et1 #distance of the camera from the center of the robot in x-axis
 l_camera_y: 0.0 # distance of the camera from the center of the robot in y-axis
-# Angle offset between x-axis and the camera
-angleOfset: 0.0 #can be removed
+
 # Number of the needed map
-mapNumber: 1
+mapNumber: -1
+# 0: back_hangar_outside_monday_1
+# 1: back_Hangar_outside_Friday_1
+tableMapPaths: [/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_hangar_outside_monday_1/environmentPSEs.cfg, /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_Hangar_outside_Friday_1/environmentPSEs.cfg]
+tableOriginX: [468589.12, 0.0]
+tableOriginY: [5264024.62, 0.0]
+tableRotationAngleCamToUTM: [-0.296706, 0.0]
