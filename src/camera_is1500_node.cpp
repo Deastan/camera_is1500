@@ -39,9 +39,6 @@ double angle_camPos_robotCenter = RAD2DEG(atan2(l_y,l_x)); //in deg
 int mapNumber = 0;
 int lastMapNumber = -1;
 std::vector<string> tableMapPaths; // GPS
-std::vector<double> tableOriginX;
-std::vector<double> tableOriginY;
-std::vector<double> tableRotationAngleCamToUTM;
 std::vector<float> v;
 // metric
 double err_dist = 0;
@@ -138,7 +135,6 @@ double compute_variance(std::vector<double> v)
   return (sq_sum / v.size());
 }
 
-
 // Initial variables from cfg file
 void init(ros::NodeHandle nh)
 {
@@ -163,31 +159,10 @@ void init(ros::NodeHandle nh)
   {
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/tableMapPaths");
   }
-  // std::vector<double> tableDataMap = [nh.getParam("/camera_is1500_node/tableOriginX"),
-  //   nh.getParam("/camera_is1500_node/tableOriginY")]; // GPS
-
-  if(!nh.getParam("/camera_is1500_node/tableOriginX", tableOriginX))
-  {
-    ROS_ERROR("Could not find topic parameter : /camera_is1500_node/tableOriginX");
-  }
-
-  if(!nh.getParam("/camera_is1500_node/tableOriginY", tableOriginY))
-  {
-    ROS_ERROR("Could not find topic parameter : /camera_is1500_node/tableOriginY");
-  }
-
-  if(!nh.getParam("/camera_is1500_node/tableRotationAngleCamToUTM", tableRotationAngleCamToUTM))
-  {
-    ROS_ERROR("Could not find topic parameter : /camera_is1500_node/tableRotationAngleCamToUTM");
-  }
-  // std::vector<double> tableDataMap[tableOriginX.size()][3] = {tableOriginX,tableOriginY, tableRotationAngleCamToUTM};//tableDataMap[tableOriginX.size()][3]
   std::cout << "Loaded map: " << std::endl;
   for(int i = 0;i<tableMapPaths.size();i++)
   {
-    std::cout << tableMapPaths[i] << ", "
-      << tableOriginX[i] << ", "
-      << tableOriginY[i] << ", "
-      << tableRotationAngleCamToUTM[i] << ", "<< std::endl;
+    std::cout << i+1 << ": " << tableMapPaths[i] << " " << std::endl;
   }
 }
 
@@ -204,7 +179,7 @@ void changeMap(ros::NodeHandle nh, int &numberMap, int &lastMapNumber,
   if(numberMap != lastMapNumber)
   {
     system("gnome-terminal -x sh -c 'pkill sfHub'");
-    std::ifstream  src("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_hangar_outside_monday_1/environmentPSEs.cfg", std::ios::binary);
+    std::ifstream  src(tableMapPathsArg[0].c_str(), std::ios::binary);
     if(numberMap < tableMapPathsArg.size() and numberMap >= 0)
     {
       ROS_INFO("Map set");
@@ -212,13 +187,14 @@ void changeMap(ros::NodeHandle nh, int &numberMap, int &lastMapNumber,
     }else
     {
       ROS_INFO("Default map set");
-      std::ifstream  src("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_hangar_outside_monday_1/environmentPSEs.cfg", std::ios::binary);
+      std::ifstream  src(tableMapPathsArg[0].c_str(), std::ios::binary);
     }
     std::ofstream  dst("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/S1/environmentPSEs.cfg",   std::ios::binary);
     dst << src.rdbuf();
     system("gnome-terminal -x sh -c 'cd && cd /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
     lastMapNumber = numberMap;
     // return true;
+    ros::Duration(5.0).sleep(); // sleep for 5 seconds
   }
 }
 
@@ -233,7 +209,7 @@ void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
   //std::cout << v[3] << ", " << v[4] << ", " << v[5] << ", " <<
   //   v[0] << ", " << v[1] << ", " << v[2] << ", " << std::endl;
 
-  // Calculation of the velocity
+  // Calculation of the robot's velocity
   float curr_x = v[3];
   float curr_y = v[4];
   double yaw_cam = v[2]; // in deg
@@ -251,7 +227,9 @@ void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
   double centerRobotPoseX = curr_x - cos(DEGTORAD(yaw_cam))*l;
   double centerRobotPoseY = curr_y - sin(DEGTORAD(yaw_cam))*l;
 
-  // Publish the transforms over tf
+  // Publish the transforms over tf if publish_tf_bool == True
+  // TODO :
+  //        - switch with GPS
   if(publish_tf_bool)
   {
     geometry_msgs::TransformStamped odom_trans;
@@ -264,17 +242,6 @@ void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
     odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(DEGTORAD(yaw));
     br.sendTransform(odom_trans);
   }
-
-  // In GPS coordinates
-  //geometry_msgs::TransformStamped odom_trans2;
-  //odom_trans2.header.stamp = current_time;
-  //odom_trans2.header.frame_id = "odom";
-  //odom_trans2.child_frame_id = "base_link";
-  //odom_trans2.transform.translation.x = centerRobotPoseX * cos(rotationAngleCamToUTM) + centerRobotPoseY * cos(1.57079632679 - rotationAngleCamToUTM) - 65.88;
-  //odom_trans2.transform.translation.y = centerRobotPoseX * sin(rotationAngleCamToUTM) + centerRobotPoseY * sin(1.57079632679 - rotationAngleCamToUTM) - 55.38;
-  //odom_trans2.transform.translation.z = 0.0;
-  //odom_trans2.transform.rotation = tf::createQuaternionMsgFromYaw(DEGTORAD(v[2]) + rotationAngleCamToUTM);
-  //br.sendTransform(odom_trans2);
 
   // Position of the camera in the reference of the camera
   nav_msgs::Odometry odom;
@@ -368,6 +335,8 @@ void metricCamera(const nav_msgs::Odometry::ConstPtr& msg)
   // Cost vector
   cost_function = (alpha_1 * err_dist + alpha_2 * err_predict +
     alpha_3 * err_angle);
+  // std::cout << "cost_vector: " << cost_function << ", err_dist: " << err_dist <<
+  //   "err_predict: " << err_predict << ", err_angle: " << err_angle << std::endl;
 
   if(cost_function > threshold)
   {
