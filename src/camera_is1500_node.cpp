@@ -82,6 +82,10 @@ int main(int argc, char **argv)
   return 0;
 } // end main
 
+//******************************************************************************
+//  Definition of functions
+//******************************************************************************
+
 void openSfHub()
 {
   // Open buffer to take data from the camera,
