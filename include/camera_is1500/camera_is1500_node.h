@@ -8,6 +8,8 @@
 #include <ros/callback_queue.h>
 // include libraries
 #include <string>
+
+// #include "std_msgs/String.h"
 #include "interface.h"
 // #include <math.h>
 #include <cmath>
@@ -39,3 +41,4 @@ void changeMap(ros::NodeHandle nh, int &numberMap, int &lastMapNumber,
 void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
   ros::Publisher odom_track_pub, ros::Time &last_time,
   tf2_ros::TransformBroadcaster br);
+void metricCamera(const nav_msgs::Odometry::ConstPtr& msg);

@@ -14,6 +14,7 @@
 #include <camera_is1500_node.h>
 
 // Variables initialization :
+double frequency = 100; // Hz
 // velocity
 double last_x = 0;
 double last_y = 0;
@@ -42,7 +43,19 @@ std::vector<double> tableOriginX;
 std::vector<double> tableOriginY;
 std::vector<double> tableRotationAngleCamToUTM;
 std::vector<float> v;
-
+// metric
+double err_dist = 0;
+double predict_x = 0;
+double predict_y = 0;
+double err_predict = 0;
+double increment_time = 1/frequency; // in seconde
+double err_angle = 0;
+double cost_function = 0;
+double threshold = 0.8;
+double alpha_1 = 1.5; //err_dist
+double alpha_2 = 1.5; //err_predict
+double alpha_3 = 0.5; //err_angle
+bool publish_tf_bool = 1;
 //******************************************************************************
 //  MAIN
 //******************************************************************************
@@ -58,8 +71,8 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;//if private param can put that after nh like nh("~");
   ros::Publisher track_pub = nh.advertise<nav_msgs::Odometry>("position_camera_is1500", 1);//10000 to 1
   ros::Publisher odom_track_pub = nh.advertise<nav_msgs::Odometry>("base_link_odom_camera_is1500", 1); //1000 to 1
-  ros::Rate loop_rate(100);
-
+  ros::Rate loop_rate(frequency);
+  ros::Subscriber sub = nh.subscribe("base_link_odom_camera_is1500", 1, metricCamera);
   // Get parameters
   init(nh);
 
@@ -239,15 +252,18 @@ void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
   double centerRobotPoseY = curr_y - sin(DEGTORAD(yaw_cam))*l;
 
   // Publish the transforms over tf
-  geometry_msgs::TransformStamped odom_trans;
-  odom_trans.header.stamp = current_time;
-  odom_trans.header.frame_id = "odom";
-  odom_trans.child_frame_id = "base_link";
-  odom_trans.transform.translation.x = centerRobotPoseX;
-  odom_trans.transform.translation.y = centerRobotPoseY;
-  odom_trans.transform.translation.z = 0.0;
-  odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(DEGTORAD(yaw));
-  br.sendTransform(odom_trans);
+  if(publish_tf_bool)
+  {
+    geometry_msgs::TransformStamped odom_trans;
+    odom_trans.header.stamp = current_time;
+    odom_trans.header.frame_id = "odom";
+    odom_trans.child_frame_id = "base_link";
+    odom_trans.transform.translation.x = centerRobotPoseX;
+    odom_trans.transform.translation.y = centerRobotPoseY;
+    odom_trans.transform.translation.z = 0.0;
+    odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(DEGTORAD(yaw));
+    br.sendTransform(odom_trans);
+  }
 
   // In GPS coordinates
   //geometry_msgs::TransformStamped odom_trans2;
@@ -329,4 +345,33 @@ void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
   last_x = curr_x;
   last_y = curr_y;
   last_yaw = yaw;
+}
+
+void metricCamera(const nav_msgs::Odometry::ConstPtr& msg)
+{
+  double pos_x = msg->pose.pose.position.x;
+  double pos_y = msg->pose.pose.position.y;
+  // std::cout << "I heard: " << msg->pose.pose.orientation.x << std::endl;
+  // Close to covariance
+  // Compare the error between the position actual position with the one before
+  err_dist = pow(pow(pos_x - last_x, 2) + pow(pos_y -  last_y, 2), 0.5);
+
+  // Error btw where it should be and where it is
+  predict_x = (last_x + increment_time * cos(last_yaw) * msg->twist.twist.linear.x);
+  predict_y = (last_y + increment_time * sin(last_yaw) * msg->twist.twist.linear.x);
+  err_predict = pow((pow(predict_x - pos_x, 2) +
+    pow(predict_y - pos_y, 2)), 0.5);
+  // Error in btw prediction direction and direction of the robot (normalized)
+  err_angle = (abs((atan2(predict_y - last_y,predict_x - last_x) -
+    atan2(pos_y - last_y, pos_x - last_x))/(2*M_PI)));
+
+  // Cost vector
+  cost_function = (alpha_1 * err_dist + alpha_2 * err_predict +
+    alpha_3 * err_angle);
+
+  if(cost_function > threshold)
+  {
+    std::cout << "Aie aie aie" << std::endl;
+    publish_tf_bool = !publish_tf_bool;
+  }
 }
