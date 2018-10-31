@@ -158,56 +158,14 @@ void init(ros::NodeHandle nh)
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/mapNumber");
   }
 
-  // nh.getParam("my_double_list", my_double_list);
   if(!nh.getParam("/camera_is1500_node/tableMapPaths", tableMapPaths))
   {
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/tableMapPaths");
   }
-  // std::cout << "New try" << std::endl;
-  // XmlRpc::XmlRpcValue my_list;
-  // std::vector<std::string> my_list;
-  // std::cout << "New try" << std::endl;
-  // nh.getParam("/camera_is1500_node/tableMapPaths", my_list);
-  // std::cout << "New try" << std::endl;
-  // if ( my_list.stringFromXml ( tableMapPaths, &offset ) == TRUE )
-
-        // printf ("\"topic_list = \"%s", topicsList );
-        // std::cout <<  "Topic %d is: %s.\n", 1, static_cast<std::string>(my_list[0]).c_str() ;
-        // std::cout << 1 << ": " << my_list["tableMapPaths"][0] << std::endl;//tableMapPaths[i] << " " << std::endl;
-        // std::cout << static_cast<std::string>(my_list[0][0]) << std::endl;
-
-  // std::cout << "Loaded map: " << std::endl;
-  // std::string intermed = "";
-  // XmlRpc::XmlRpcValue my_list;
-  // my_list = tableMapPaths;
-  // ROS_ASSERT(my_list.getType() == XmlRpc::XmlRpcValue::TypeArray);
-  //
-  // for (int32_t i = 0; i < my_list.size(); ++i)
-  // {
-  //   ROS_ASSERT(my_list[i].getType() == XmlRpc::XmlRpcValue::TypeDouble);
-  //   std::string static_cast<double>(my_list[i]);
-  //   std::cout << i+1 << ": " << intermed << std::endl;//tableMapPaths[i] << " " << std::endl;
-  // }
-  // ROS_ASSERT(tableMapPaths.getType() == XmlRpc::XmlRpcValue::TypeArray);
-  // for(int i = 0;i<tableMapPaths.size();i++)
-  // {
-  //   // XmlRpc::XmlRpcValue sublist = tableMapPaths[i];
-  //   // intermed = sublist["path"];
-  //   // std::cout << i+1 << ": " << intermed << std::endl;//tableMapPaths[i] << " " << std::endl;
-  //   std::cout << i+1 << ": " << tableMapPaths[i][0] << " " << std::endl;
-  //
-  // }
+  std::cout << "Loaded maps: " << " " << std::endl;
   for(int i = 0;i<tableMapPaths.size();i++)
   {
     std::cout << i+1 << ": " << tableMapPaths[i] << " " << std::endl;
-    // std::cout << i+1 << ": " ;
-    // for(int j = 0; j < 25;j++)
-    // {// XmlRpc::XmlRpcValue sublist = tableMapPaths[i];
-    // // intermed = sublist["path"];
-    // // std::cout << i+1 << ": " << intermed << std::endl;//tableMapPaths[i] << " " << std::endl;
-    //   std::cout << tableMapPaths[i][j]; // tableMapPaths[i].size(); //
-    // }
-    // std::cout << std::endl;
   }
   //
 }
