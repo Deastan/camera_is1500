@@ -1,8 +1,18 @@
 <launch>
     <node name="camera_is1500_node" pkg="camera_is1500" type="camera_is1500" output="screen">
       <!-- <remap from="base_link_odom_camera_is1500" to="odom"/>   -->
+      <param name="mapNumber" value="0" />
+      <param name="l_camera_x" value="0.85" />
+      <param name="l_camera_y" value="0.0" />
+      <!-- <param name="tableMapPaths" value="[/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_hangar_outside_monday_1/environmentPSEs.cfg,
+        /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_Hangar_outside_Friday_1/environmentPSEs.cfg]" /> -->
+
       <rosparam command= "load"
-        file="/home/jonathan/catkin_ws_kyb/src/camera_is1500/param/config.yaml"/>
+        file="/home/jonathan/catkin_ws_kyb/src/camera_is1500/param/map_test_import_1.yaml"/>
+      <!-- <rosparam command= "load"
+        file="/home/jonathan/catkin_ws_kyb/src/camera_is1500/param/map_test.yaml"/> -->
+      <!-- <rosparam file="/home/jonathan/catkin_ws_kyb/src/camera_is1500/param/config.yaml" command="load" ns="parameter" /> -->
+      <!-- <rosparam file="/home/jonathan/catkin_ws_kyb/src/camera_is1500/param/map_test.yaml" command="load"/> -->
     </node>
     <!-- <node name="waypoint_node" pkg="camera_is1500" type="waypoint_node.py" respawn="false" output="screen">
        </node> -->

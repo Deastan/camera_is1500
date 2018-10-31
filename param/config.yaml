@@ -3,12 +3,12 @@
 
 # Placement of the camera in x-axis
 # Assumption : only change in x direction
-l_camera_x: 0.85 # here for et1 #distance of the camera from the center of the robot in x-axis
-l_camera_y: 0.0 # distance of the camera from the center of the robot in y-axis
+# l_camera_x: 0.85 # here for et1 #distance of the camera from the center of the robot in x-axis
+# l_camera_y: 0.0 # distance of the camera from the center of the robot in y-axis
 
 # Number of the needed map
 # Number 0 = default map !
-mapNumber: 0
+# mapNumber: 0
 # 0: back_hangar_outside_monday_1
 # 1: back_Hangar_outside_Friday_1
 tableMapPaths: [/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_hangar_outside_monday_1/environmentPSEs.cfg,
