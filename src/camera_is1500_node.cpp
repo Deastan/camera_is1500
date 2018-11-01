@@ -72,7 +72,7 @@ int main(int argc, char **argv)
   ros::Publisher track_pub = nh.advertise<nav_msgs::Odometry>("position_camera_is1500", 1);//10000 to 1
   ros::Publisher odom_track_pub = nh.advertise<nav_msgs::Odometry>("base_link_odom_camera_is1500", 1); //1000 to 1
   ros::Rate loop_rate(frequency);
-  ros::Subscriber sub = nh.subscribe("base_link_odom_camera_is1500", 1, metricCamera);
+  ros::Subscriber sub_for_metric = nh.subscribe("base_link_odom_camera_is1500", 1, metricCamera);
   // Get parameters
   init(nh);
 
@@ -167,10 +167,9 @@ void init(ros::NodeHandle nh)
   {
     std::cout << i+1 << ": " << tableMapPaths[i] << " " << std::endl;
   }
-  //
+
 }
-// XmlRpc::XmlRpcValue sublist = list[i];
-//       id=sublist["id"];
+
 // Change the map in sfHub
 // close sfHub and re-run sfHub with new changed map
 // 1 = hangar
@@ -321,14 +320,15 @@ void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
   last_yaw = yaw;
 }
 
+// Metric : switch/remove the sending of tf from the camera
+// TODO add a jump of velocity using the grad
 void metricCamera(const nav_msgs::Odometry::ConstPtr& msg)
-{
+{ 
   double pos_x = msg->pose.pose.position.x;
   double pos_y = msg->pose.pose.position.y;
-  // std::cout << "I heard: " << msg->pose.pose.orientation.x << std::endl;
   // Close to covariance
   // Compare the error between the position actual position with the one before
-  err_dist = pow(pow(pos_x - last_x, 2) + pow(pos_y -  last_y, 2), 0.5);
+  err_dist = pow(pow(pos_x - last_x, 2) + pow(pos_y - last_y, 2), 0.5);
 
   // Error btw where it should be and where it is
   predict_x = (last_x + increment_time * cos(last_yaw) * msg->twist.twist.linear.x);
@@ -350,4 +350,10 @@ void metricCamera(const nav_msgs::Odometry::ConstPtr& msg)
     std::cout << "Aie aie aie" << std::endl;
     publish_tf_bool = !publish_tf_bool;
   }
+}
+
+// Straiht line until camera metric is good
+void deadRecon(ros::NodeHandle nh)
+{
+  // ros::Subscriber sub_wheel_odom = nh.subscribe("wheel_odom", 1, );
 }

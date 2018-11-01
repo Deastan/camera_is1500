@@ -113,7 +113,7 @@ def turning_callback(msg):
         mot_msg.angular.z = 0.0
     mot_pub.publish(mot_msg)
     end = time.time()
-    print('End function duration:',1/(end - start))
+    print('End function duration:', 1/(end - start))
 
 def run():
     rospy.loginfo("Waypoint starting up")
@@ -131,6 +131,7 @@ if __name__ == '__main__':
         run()
     except rospy.ROSInterruptException:
         pass
+    # To be sure it is stop
     mot_msg.linear.x = 0.0
     mot_msg.linear.y = 0.0
     mot_msg.angular.z = 0.0

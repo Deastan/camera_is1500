@@ -42,3 +42,4 @@ void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
   ros::Publisher odom_track_pub, ros::Time &last_time,
   tf2_ros::TransformBroadcaster br);
 void metricCamera(const nav_msgs::Odometry::ConstPtr& msg);
+void deadRecon(ros::NodeHandle nh);
