@@ -8,7 +8,7 @@
         /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_Hangar_outside_Friday_1/environmentPSEs.cfg]" /> -->
 
       <rosparam command= "load"
-        file="/home/jonathan/catkin_ws_kyb/src/camera_is1500/param/map_test_import_1.yaml"/>
+        file="/home/ew/catkin_ws/src/camera_is1500/param/map_test_import_1.yaml"/>
       <!-- <rosparam command= "load"
         file="/home/jonathan/catkin_ws_kyb/src/camera_is1500/param/map_test.yaml"/> -->
       <!-- <rosparam file="/home/jonathan/catkin_ws_kyb/src/camera_is1500/param/config.yaml" command="load" ns="parameter" /> -->

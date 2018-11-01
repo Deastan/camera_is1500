@@ -193,9 +193,9 @@ void changeMap(ros::NodeHandle nh, int &numberMap, int &lastMapNumber,
       ROS_INFO("Default map set");
       std::ifstream  src(tableMapPathsArg[0].c_str(), std::ios::binary);
     }
-    std::ofstream  dst("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/S1/environmentPSEs.cfg",   std::ios::binary);
+    std::ofstream  dst("/home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/S1/environmentPSEs.cfg",   std::ios::binary);
     dst << src.rdbuf();
-    system("gnome-terminal -x sh -c 'cd && cd /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
+    system("gnome-terminal -x sh -c 'cd && cd /home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
     // system("gnome-terminal -x sh -c 'cd && cd && cd catkin_ws_kyb && source devel/setup.bash && roscd camera_is1500/ && cd external_software/sfHub/ && ./sfHub'");
 
     lastMapNumber = numberMap;
@@ -323,7 +323,7 @@ void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
 // Metric : switch/remove the sending of tf from the camera
 // TODO add a jump of velocity using the grad
 void metricCamera(const nav_msgs::Odometry::ConstPtr& msg)
-{ 
+{
   double pos_x = msg->pose.pose.position.x;
   double pos_y = msg->pose.pose.position.y;
   // Close to covariance
