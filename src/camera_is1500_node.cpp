@@ -219,9 +219,9 @@ void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
   float curr_x = v[3];
   float curr_y = v[4];
   double yaw_cam = v[2]; // in deg
-  double yaw =  v[2] - angle_camPos_robotCenter;// - RAD2DEG(atan2(l_y,l_x)); //in deg
-  // std::cout << "Yaw : " << yaw << std::endl;
-  // std::cout << "angle from Camera: " << yaw_cam << ", yaw: " << yaw << ", camAngle: " << cam_position_angle << std::endl;
+  double yaw =  v[2];// - angle_camPos_robotCenter;// - RAD2DEG(atan2(l_y,l_x)); //in deg
+  std::cout << "Yaw : " << yaw << std::endl;
+  std::cout << "angle from Camera: " << yaw_cam << ", yaw: " << yaw << ", camAngle: " << angle_camPos_robotCenter << std::endl;
   ros::Time current_time = ros::Time::now();
   float dx = (curr_x - last_x);
   float dy = (curr_y - last_y);

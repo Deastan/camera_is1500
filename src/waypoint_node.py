@@ -46,7 +46,7 @@ ready_to_go = rospy.set_param('/waypoint_node/ready_to_go', False)#
 global success
 success = rospy.set_param('/waypoint_node/success', False)#
 global target
-target = rospy.set_param('/waypoint_node/target', [3.0,3.0])
+target = rospy.set_param('/waypoint_node/target', [1.0,3.0])
 #target = rospy.set_param('/waypoint_node/target', [3.7,-6.0])
 
 def turning_callback(msg):
@@ -71,14 +71,14 @@ def turning_callback(msg):
     angle = np.arctan2(v[1], v[0])
     err_angle = angle - yaw # angle(u, v)
     err_x = length(v) # distance btw robot un target
-    #print(yaw, ', angle: ', angle, ', error angle: ', err_angle)
-    # print("Err_angle : ", err_angle, "Err_x : ", err_x, '\n', "Robot position : (", robot_x, ", ", robot_y, ") ")
+    print('Yaw: ',yaw/2/3.14*360, ', angle target: ', angle/2/3.14*360, ', error angle: ', err_angle/2/3.14*360)
+    #print("Err_angle : ", err_angle, "Err_x : ", err_x, '\n', "Robot position : (", robot_x, ", ", robot_y, ") ")
     end = time.time()
-    print("Interm duration: ",1/(end - start_interm))
+    #print("Interm duration: ",1/(end - start_interm))
     if(ready_to_go == 1 and success == 0): # Success is not used yet...
 
 
-        print("Err_angle : ", err_angle, "Err_x : ", err_x, '\n', "Robot position : (", robot_x, ", ", robot_y, ")")
+        #print("Err_angle : ", err_angle, "Err_x : ", err_x, '\n', "Robot position : (", robot_x, ", ", robot_y, ")")
 
         # First change the angle to have the point in front of the robot and
         # after move forward
