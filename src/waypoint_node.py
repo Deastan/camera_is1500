@@ -46,7 +46,7 @@ ready_to_go = rospy.set_param('/waypoint_node/ready_to_go', False)#
 #global success
 success = rospy.set_param('/waypoint_node/success', False)#
 #global target
-target = rospy.set_param('/waypoint_node/target', [1.0,3.0])
+#target = rospy.set_param('/waypoint_node/target', [1.0,3.0])
 #target = rospy.set_param('/waypoint_node/target', [3.7,-6.0])
 
 def turning_callback(msg):
@@ -55,12 +55,13 @@ def turning_callback(msg):
     # Re-assignement inside func
     global ready_to_go
     global success
-    global target
+    #global target
+    target = [1.0,2.0]
     global mot_msg
-    rate = rospy.Rate(10)
-    ready_to_go = rospy.get_param('/waypoint_node/ready_to_go')
-    success = rospy.get_param('/waypoint_node/success')
-    target = rospy.get_param('/waypoint_node/target')
+    rate = rospy.Rate(130)
+    #ready_to_go = rospy.get_param('/waypoint_node/ready_to_go')
+    #success = rospy.get_param('/waypoint_node/success')
+    #target = rospy.get_param('/waypoint_node/target')
 
     robot_x = msg.pose.pose.position.x
     robot_y = msg.pose.pose.position.y
@@ -70,18 +71,18 @@ def turning_callback(msg):
     angle = np.arctan2(v[1], v[0])
     err_angle = angle - yaw # angle(u, v)
     err_x = length(v) # distance btw robot un target
-    print('Yaw: ',yaw/2/3.14*360, ', angle target: ', angle/2/3.14*360, ', error angle: ', err_angle/2/3.14*360)
+    #print('Yaw: ',yaw/2/3.14*360, ', angle target: ', angle/2/3.14*360, ', error angle: ', err_angle/2/3.14*360)
     #print("Err_angle : ", err_angle, "Err_x : ", err_x, '\n', "Robot position : (", robot_x, ", ", robot_y, ") ")
     end = time.time()
     #print("Interm duration: ",1/(end - start_interm))
-    if(ready_to_go == 1 and success == 0): # Success is not used yet...
+    if(True):#ready_to_go == 1 and success == 0): # Success is not used yet...
 
 
-        #print("Err_angle : ", err_angle, "Err_x : ", err_x, '\n', "Robot position : (", robot_x, ", ", robot_y, ")")
+        print("Err_angle : ", err_angle, "Err_x : ", err_x, '\n', "Robot position : (", robot_x, ", ", robot_y, ")")
 
         # First change the angle to have the point in front of the robot and
         # after move forward
-        if(np.abs(err_angle) > 0.20 and np.abs(err_x) > 0.15): # envi 2*2.9 deg
+        if(np.abs(err_angle) > 0.15 and np.abs(err_x) > 0.1): # envi 2*2.9 deg
             if(err_angle < 0 or err_angle > 3.1457):
                 mot_msg.angular.z =  0.6
                 mot_msg.linear.x = 0.0
@@ -93,7 +94,7 @@ def turning_callback(msg):
                 mot_msg.linear.y = 0.0
         else:
             mot_msg.angular.z = 0.0
-            if(np.abs(err_x) > 0.15): # envi 2.9 deg
+            if(np.abs(err_x) > 0.1): # envi 2.9 deg
                 if(err_x > 0):
                     mot_msg.linear.x = 0.35
                     mot_msg.linear.y = 0.0
@@ -110,18 +111,17 @@ def turning_callback(msg):
         mot_msg.linear.x = 0.0
         mot_msg.linear.y = 0.0
         mot_msg.angular.z = 0.0
-
-    while not rospy.is_shutdown():
-
-        rate.sleep()
+    rate.sleep()
+    #while not rospy.is_shutdown():
+        #rate.sleep()
     mot_pub.publish(mot_msg)
     end = time.time()
-    print('End function duration:', 1/(end - start))
+    #print('End function duration:', 1/(end - start))
 
 def run():
     rospy.loginfo("Waypoint starting up")
     rospy.init_node('Waypoint')
-    self.rate = rospy.Rate(10)
+    #self.rate = rospy.Rate(10)
     rospy.Subscriber("/base_link_odom_camera_is1500", Odometry, turning_callback)
 
     #rate.sleep()
