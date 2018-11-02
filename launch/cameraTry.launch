@@ -2,8 +2,9 @@
     <node name="camera_is1500_node" pkg="camera_is1500" type="camera_is1500" output="screen">
       <!-- <remap from="base_link_odom_camera_is1500" to="odom"/>   -->
       <param name="mapNumber" value="0" />
-      <param name="l_camera_x" value="0.85" />
-      <param name="l_camera_y" value="0.0" />
+      <param name="l_camera_x" value="0.00" /><!-- 0.85  -->
+      <param name="l_camera_y" value="0.35" />
+      <param name="angleCameraConfig" value="90.0"/> <!-- angle positive if camera turn in right  -->
       <!-- <param name="tableMapPaths" value="[/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_hangar_outside_monday_1/environmentPSEs.cfg,
         /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_Hangar_outside_Friday_1/environmentPSEs.cfg]" /> -->
 

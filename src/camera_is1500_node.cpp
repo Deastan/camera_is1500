@@ -37,8 +37,9 @@ double TWIST_COVAR [6][6] = {{0.0001, 0, 0, 0, 0, 0},
                {0, 0, 0, 0, 0, 0.0001}};
 double l_x; // [m] in meter // Distance between center of the robot and the camera
 double l_y; // [m] in meter // Distance between center of the robot and the camera
+double angleCameraConfig;
 double l = sqrt(pow(l_x,2) + pow(l_y, 2)); // distance btw camera and robot center
-double angle_camPos_robotCenter = RAD2DEG(atan2(l_y,l_x)); //in deg
+double angle_camPos_robotCenter = 90;//RAD2DEG(atan2(l_y,l_x)); //in deg
 int mapNumber = 0;
 int lastMapNumber = -1;
 std::vector<string> tableMapPaths; // GPS
@@ -144,16 +145,20 @@ void init(ros::NodeHandle nh)
   if(!nh.getParam("/camera_is1500_node/l_camera_x", l_x))
   {
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/l_camera_x");
-    l_x = 0.835; // set default value
+    l_x = 0.0; // set default value
   }
 
   if(!nh.getParam("/camera_is1500_node/l_camera_y", l_y))
   {
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/l_camera_y");
-    l_y = 0; // set default value
+    l_y = 0.350; // set default value
   }
 
   if(!nh.getParam("/camera_is1500_node/mapNumber", mapNumber))
+  {
+    ROS_ERROR("Could not find topic parameter : /camera_is1500_node/mapNumber");
+  }
+  if(!nh.getParam("/camera_is1500_node/angleCameraConfig", angleCameraConfig))
   {
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/mapNumber");
   }
@@ -219,9 +224,21 @@ void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
   float curr_x = v[3];
   float curr_y = v[4];
   double yaw_cam = v[2]; // in deg
-  double yaw =  v[2];// - angle_camPos_robotCenter;// - RAD2DEG(atan2(l_y,l_x)); //in deg
-  std::cout << "Yaw : " << yaw << std::endl;
-  std::cout << "angle from Camera: " << yaw_cam << ", yaw: " << yaw << ", camAngle: " << angle_camPos_robotCenter << std::endl;
+  double yaw;
+  if(yaw_cam<180 and yaw_cam>0.0 )
+  {
+    yaw =  v[2] - angleCameraConfig;
+  }else if(yaw_cam>-180 and yaw_cam<-90.0)
+  {
+    yaw = 180.0 + v[2] + angleCameraConfig;
+  }else
+  {
+    yaw = v[2] - angleCameraConfig;
+  }
+
+  // - RAD2DEG(atan2(l_y,l_x)); //in deg
+  //std::cout << "Yaw : " << yaw << std::endl;
+  std::cout << "angle of Camera: " << yaw_cam << ", yaw of robot: " << yaw << ", param camAngle: " << angleCameraConfig << std::endl;
   ros::Time current_time = ros::Time::now();
   float dx = (curr_x - last_x);
   float dy = (curr_y - last_y);
