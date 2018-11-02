@@ -37,15 +37,15 @@ def unit_vector(vector):
     """ Returns the unit vector of the vector.  """
     return vector / np.linalg.norm(vector)
 
-global mot_pub
+#global mot_pub
 mot_pub = rospy.Publisher('/cmd_vel', Twist, queue_size = 1) # 100 to 1
-global mot_msg # Contain the msg
-
-global ready_to_go
+#global mot_msg # Contain the msg
+mot_msg = Twist()
+#global ready_to_go
 ready_to_go = rospy.set_param('/waypoint_node/ready_to_go', False)#
-global success
+#global success
 success = rospy.set_param('/waypoint_node/success', False)#
-global target
+#global target
 target = rospy.set_param('/waypoint_node/target', [1.0,3.0])
 #target = rospy.set_param('/waypoint_node/target', [3.7,-6.0])
 
@@ -57,8 +57,7 @@ def turning_callback(msg):
     global success
     global target
     global mot_msg
-    mot_msg = Twist()
-
+    rate = rospy.Rate(10)
     ready_to_go = rospy.get_param('/waypoint_node/ready_to_go')
     success = rospy.get_param('/waypoint_node/success')
     target = rospy.get_param('/waypoint_node/target')
@@ -111,6 +110,10 @@ def turning_callback(msg):
         mot_msg.linear.x = 0.0
         mot_msg.linear.y = 0.0
         mot_msg.angular.z = 0.0
+
+    while not rospy.is_shutdown():
+
+        rate.sleep()
     mot_pub.publish(mot_msg)
     end = time.time()
     print('End function duration:', 1/(end - start))
@@ -118,10 +121,16 @@ def turning_callback(msg):
 def run():
     rospy.loginfo("Waypoint starting up")
     rospy.init_node('Waypoint')
+    self.rate = rospy.Rate(10)
     rospy.Subscriber("/base_link_odom_camera_is1500", Odometry, turning_callback)
 
+    #rate.sleep()
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
+
+ #def main_loop(self):
+#    while not rospy.is_shutdown():
+#        self.rate.sleep()
 
 #*******************************************************************************
 #   Main
