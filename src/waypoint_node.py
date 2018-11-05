@@ -56,7 +56,7 @@ def turning_callback(msg):
     global ready_to_go
     global success
     #global target
-    target = [1.0,4.0]
+    target = [3.5,0.5]
     global mot_msg
     rate = rospy.Rate(130)
     #ready_to_go = rospy.get_param('/waypoint_node/ready_to_go')
