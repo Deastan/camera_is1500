@@ -39,7 +39,6 @@ double l_x; // [m] in meter // Distance between center of the robot and the came
 double l_y; // [m] in meter // Distance between center of the robot and the camera
 double angleCameraConfig;
 double l = sqrt(pow(l_x,2) + pow(l_y, 2)); // distance btw camera and robot center
-double angle_camPos_robotCenter = 90;//RAD2DEG(atan2(l_y,l_x)); //in deg
 int mapNumber = 0;
 int lastMapNumber = -1;
 std::vector<string> tableMapPaths; // GPS
@@ -154,6 +153,8 @@ void init(ros::NodeHandle nh)
     l_y = 0.350; // set default value
   }
 
+  l = sqrt(pow(l_x,2) + pow(l_y, 2)); // distance btw camera and robot center
+
   if(!nh.getParam("/camera_is1500_node/mapNumber", mapNumber))
   {
     ROS_ERROR("Could not find topic parameter : /camera_is1500_node/mapNumber");
@@ -225,10 +226,10 @@ void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
   float curr_y = v[4];
   double yaw_cam = v[2]; // in deg
   double yaw;
-  if(yaw_cam<180 and yaw_cam>0.0 )
+  if(yaw_cam < 180.0 and yaw_cam>0.0 )
   {
     yaw =  v[2] - angleCameraConfig;
-  }else if(yaw_cam>-180 and yaw_cam<-90.0)
+  }else if(yaw_cam>-180.0 and yaw_cam<-90.0)
   {
     yaw = 180.0 + v[2] + angleCameraConfig;
   }else
