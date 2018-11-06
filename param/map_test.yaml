@@ -2,3 +2,5 @@
   path: /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_Hangar_outside_Friday_1/environmentPSEs.cfg
 - name: blue
   path: /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/Maps/back_Hangar_outside_Friday_1/environmentPSEs.cfg
+- name: sd  sdfsfsf faf
+  path: /home/jonathan/catkin_ws_kyb/src/camera_is1500/param/map_test.yaml

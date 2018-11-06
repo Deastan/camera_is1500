@@ -199,9 +199,9 @@ void changeMap(ros::NodeHandle nh, int &numberMap, int &lastMapNumber,
       ROS_INFO("Default map set");
       std::ifstream  src(tableMapPathsArg[0].c_str(), std::ios::binary);
     }
-    std::ofstream  dst("/home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/S1/environmentPSEs.cfg",   std::ios::binary);
+    std::ofstream  dst("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/S1/environmentPSEs.cfg",   std::ios::binary);
     dst << src.rdbuf();
-    system("gnome-terminal -x sh -c 'cd && cd /home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
+    system("gnome-terminal -x sh -c 'cd && cd /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
     // system("gnome-terminal -x sh -c 'cd && cd && cd catkin_ws_kyb && source devel/setup.bash && roscd camera_is1500/ && cd external_software/sfHub/ && ./sfHub'");
 
     lastMapNumber = numberMap;
@@ -239,7 +239,7 @@ void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
 
   // - RAD2DEG(atan2(l_y,l_x)); //in deg
   //std::cout << "Yaw : " << yaw << std::endl;
-  std::cout << "angle of Camera: " << yaw_cam << ", yaw of robot: " << yaw << ", param camAngle: " << angleCameraConfig << std::endl;
+  // std::cout << "angle of Camera: " << yaw_cam << ", yaw of robot: " << yaw << ", param camAngle: " << angleCameraConfig << std::endl;
   ros::Time current_time = ros::Time::now();
   float dx = (curr_x - last_x);
   float dy = (curr_y - last_y);
