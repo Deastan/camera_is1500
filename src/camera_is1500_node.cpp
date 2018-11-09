@@ -9,6 +9,8 @@
 // - Write a file config for placement of the map file and sfHub
 // - Write a script for building interface library with right .ini setting
 // - Clean the code with function, private variables etc...
+// - Remove the rosparam to change map because it can save a lot of time
+//    inside the loop
 
 // Include
 #include <camera_is1500_node.h>
@@ -99,6 +101,8 @@ int main(int argc, char **argv)
 //  Definition of functions
 //******************************************************************************
 
+
+// Open SfHub to get the data from the camera in another terminal
 void openSfHub()
 {
   // Open buffer to take data from the camera,
@@ -122,7 +126,9 @@ void closeSfHub()
   }
 }
 
-// TODO Check if I did the right calculation
+// Calculate covariance of a vector of double
+// INPUT: vector of double
+// OUTPUT: double variable of covairance
 double compute_variance(std::vector<double> v)
 {
   double sum = std::accumulate(v.begin(), v.end(), 0.0);
@@ -138,7 +144,7 @@ double compute_variance(std::vector<double> v)
   return (sq_sum / v.size());
 }
 
-// Initial variables from cfg file
+// Initializate variables from cfg file
 void init(ros::NodeHandle nh)
 {
   if(!nh.getParam("/camera_is1500_node/l_camera_x", l_x))
@@ -176,12 +182,13 @@ void init(ros::NodeHandle nh)
 
 }
 
-// Change the map in sfHub
-// close sfHub and re-run sfHub with new changed map
+// Change the map in sfHub in closing sfHub and re-run sfHub with new loaded map
+// 0 = default
 // 1 = hangar
 // 2 = ...
 // TODO write it for real system
-// TODO perhaps it create a suscriber to a message to receive a command with new map and not from ros param
+// TODO perhaps it create a suscriber to a message receiving a command
+//      from the terminal new map and not from ros param
 void changeMap(ros::NodeHandle nh, int &numberMap, int &lastMapNumber,
   std::vector<string> tableMapPathsArg)
 {
@@ -237,9 +244,6 @@ void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
     yaw = v[2] - angleCameraConfig;
   }
 
-  // - RAD2DEG(atan2(l_y,l_x)); //in deg
-  //std::cout << "Yaw : " << yaw << std::endl;
-  // std::cout << "angle of Camera: " << yaw_cam << ", yaw of robot: " << yaw << ", param camAngle: " << angleCameraConfig << std::endl;
   ros::Time current_time = ros::Time::now();
   float dx = (curr_x - last_x);
   float dy = (curr_y - last_y);
@@ -339,7 +343,10 @@ void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
 }
 
 // Metric : switch/remove the sending of tf from the camera
-// TODO add a jump of velocity using the grad
+// TODO
+// - add a jump of velocity using the grad DONE
+// - Optimize the cost function parameters
+// - Compare to the an trajectory and not only to the next point...
 void metricCamera(const nav_msgs::Odometry::ConstPtr& msg)
 {
   double pos_x = msg->pose.pose.position.x;
@@ -357,7 +364,7 @@ void metricCamera(const nav_msgs::Odometry::ConstPtr& msg)
   err_angle = (abs((atan2(predict_y - last_y,predict_x - last_x) -
     atan2(pos_y - last_y, pos_x - last_x))/(2*M_PI)));
 
-  // Cost vector
+  // Cost vector : sum of the cost
   cost_function = (alpha_1 * err_dist + alpha_2 * err_predict +
     alpha_3 * err_angle);
   // std::cout << "cost_vector: " << cost_function << ", err_dist: " << err_dist <<
@@ -365,7 +372,7 @@ void metricCamera(const nav_msgs::Odometry::ConstPtr& msg)
 
   if(cost_function > threshold)
   {
-    std::cout << "Aie aie aie" << std::endl;
+    // std::cout << "Aie aie aie" << std::endl;
     publish_tf_bool = !publish_tf_bool;
   }
 }
