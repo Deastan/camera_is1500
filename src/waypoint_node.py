@@ -48,15 +48,17 @@ success = rospy.set_param('/waypoint_node/success', False)#
 #global target
 #target = rospy.set_param('/waypoint_node/target', [1.0,3.0])
 #target = rospy.set_param('/waypoint_node/target', [3.7,-6.0])
-
+target_x = float(sys.argv[1])
+target_y = float(sys.argv[2])
+target = [target_x, target_y]
 def turning_callback(msg):
     start = time.time()
     start_interm = time.time()
     # Re-assignement inside func
     global ready_to_go
     global success
-    #global target
-    target = [3.5,0.5]
+    global target
+    # target = [3.5,0.5]
     global mot_msg
     rate = rospy.Rate(130)
     #ready_to_go = rospy.get_param('/waypoint_node/ready_to_go')
@@ -96,7 +98,7 @@ def turning_callback(msg):
             mot_msg.angular.z = 0.0
             if(np.abs(err_x) > 0.1): # envi 2.9 deg
                 if(err_x > 0):
-                    mot_msg.linear.x = 0.35
+                    mot_msg.linear.x = 0.45
                     mot_msg.linear.y = 0.0
 
             else:

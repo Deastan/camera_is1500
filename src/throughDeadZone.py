@@ -41,9 +41,9 @@ mot_pub = rospy.Publisher('/cmd_vel', Twist, queue_size = 1) # 100 to 1
 # global mot_msg # Contain the msg
 mot_msg = Twist()
 # Distance to do
-distance = 2.0
+distance = float(sys.argv[1])#3.0
 init = False
-
+offset_x = 0.0
 def turning_callback(msg):
     # start = time.time()
     # start_interm = time.time()
@@ -53,7 +53,7 @@ def turning_callback(msg):
     global mot_msg
     rate = rospy.Rate(130)
     global init
-    offset_x = 0.0
+    global offset_x
     if init == False:
         offset_x = msg.pose.pose.position.x
         init = True
@@ -68,10 +68,21 @@ def turning_callback(msg):
     #print("Err_angle : ", err_angle, "Err_x : ", err_x, '\n', "Robot position : (", robot_x, ", ", robot_y, ") ")
     # end = time.time()
     else:
-
-        error_x = msg.pose.pose.position.x-offset_x
-        print("Distance to do: ", distance, ", error_x : ", error_x)
-
+        # if(msg.pose.pose.position.x > 0):
+        #     error_x = np.abs(msg.pose.pose.position.x - offset_x)
+        # else:
+        #     error_x = np.abs(-msg.pose.pose.position.x - offset_x)
+        error_x = np.abs(msg.pose.pose.position.x - offset_x)
+        if(msg.pose.pose.position.x > 0 and offset_x>0):
+            error_x = np.abs(msg.pose.pose.position.x - offset_x)
+        elif(msg.pose.pose.position.x < 0 and offset_x < 0):
+            error_x = np.abs(msg.pose.pose.position.x - offset_x)
+        elif(msg.pose.pose.position.x > 0 and offset_x < 0):
+            error_x = np.abs(msg.pose.pose.position.x - offset_x)
+        elif(msg.pose.pose.position.x < 0 and offset_x > 0):
+            error_x = np.abs(msg.pose.pose.position.x - offset_x)
+        print("Distance to do: ", distance, ", error_x : ", error_x, ", pose_x: ", msg.pose.pose.position.x, ", offset: ", offset_x)
+        # error_x = np.abs(msg.pose.pose.position.x - offset_x)
         # First change the angle to have the point in front of the robot and
         # after move forward
         if(error_x < distance ): # envi 2*2.9g
