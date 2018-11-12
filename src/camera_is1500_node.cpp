@@ -193,29 +193,21 @@ void changeMap(ros::NodeHandle nh, int &numberMap, int &lastMapNumber,
   std::vector<string> tableMapPathsArg)
 {
   nh.getParam("/camera_is1500_node/mapNumber", numberMap);
-  if(numberMap != lastMapNumber)
+  if(numberMap < tableMapPathsArg.size() and numberMap >= 0 and numberMap != lastMapNumber)
   {
     system("gnome-terminal -x sh -c 'pkill sfHub'");
-    std::ifstream  src(tableMapPathsArg[0].c_str(), std::ios::binary);
-    if(numberMap < tableMapPathsArg.size() and numberMap >= 0)
-    {
-      ROS_INFO("Map set");
-      std::ifstream  src(tableMapPathsArg[numberMap].c_str(), std::ios::binary);
-    }else
-    {
-      ROS_INFO("Default map set");
-      std::ifstream  src(tableMapPathsArg[0].c_str(), std::ios::binary);
-    }
+    ROS_INFO("Map is configured");
+    std::ifstream  src(tableMapPathsArg[numberMap].c_str(), std::ios::binary);
+    std::cout << "Map memory: " << src << ", path is: " << tableMapPathsArg[numberMap] << std::endl;
     std::ofstream  dst("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/S1/environmentPSEs.cfg",   std::ios::binary);
     dst << src.rdbuf();
     system("gnome-terminal -x sh -c 'cd && cd /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
     // system("gnome-terminal -x sh -c 'cd && cd && cd catkin_ws_kyb && source devel/setup.bash && roscd camera_is1500/ && cd external_software/sfHub/ && ./sfHub'");
-
     lastMapNumber = numberMap;
     // return true;
     ros::Duration(5.0).sleep(); // sleep for 5 seconds
-  }
-}
+  } // end if
+} // end function
 
 // Publish data of the get position on the ros cloud
 void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
