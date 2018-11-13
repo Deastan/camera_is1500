@@ -61,6 +61,7 @@ double alpha_1 = 1.5; //err_dist
 double alpha_2 = 1.5; //err_predict
 double alpha_3 = 0.5; //err_angle
 bool publish_tf_bool = 1;
+ros::Publisher *metric_pub;
 //******************************************************************************
 //  MAIN
 //******************************************************************************
@@ -77,8 +78,9 @@ int main(int argc, char **argv)
   ros::Publisher track_pub = nh.advertise<nav_msgs::Odometry>("position_camera_is1500", 1);//10000 to 1
   ros::Publisher odom_track_pub = nh.advertise<nav_msgs::Odometry>("base_link_odom_camera_is1500", 1); //1000 to 1
   ros::Rate loop_rate(frequency);
+  metric_pub =  new ros::Publisher(nh.advertise<camera_is1500::GetPointsFromMetric>("pointsFromMetric", 10)); //1000 to 1
   ros::Subscriber sub_for_metric = nh.subscribe("base_link_odom_camera_is1500", 1, metricCamera);
-  ros::Publisher metric_pub = nh.advertise<camera_is1500::GetPointsFromMetric>("bim", 10); //1000 to 1
+
 
   init(nh);
 
@@ -92,18 +94,11 @@ int main(int argc, char **argv)
     // load map
     changeMap(nh, mapNumber, lastMapNumber, tableMapPaths);
     publish_position(nh, track_pub, odom_track_pub, last_time, br);
+
     ros::spinOnce();
     loop_rate.sleep();
 
-    // test messages
-    camera_is1500::GetPointsFromMetric msg;
-    msg.x = 1.0;
-    msg.y = 2.0;
-    msg.z = 0.0;
-    msg.yaw = 3.14;
-    msg.cost = 100.0;
-    msg.mapNumber = 0;
-    metric_pub.publish(msg);
+
     // Get parameters
   } // end ros-loop
 
@@ -352,6 +347,7 @@ void publish_position(ros::NodeHandle nh, ros::Publisher track_pub,
 // Metric : switch/remove the sending of tf from the camera
 // TODO
 // - add a jump of velocity using the grad DONE
+// - add the Yaw measure
 // - Optimize the cost function parameters
 // - Compare to the an trajectory and not only to the next point...
 void metricCamera(const nav_msgs::Odometry::ConstPtr& msg)
@@ -380,7 +376,21 @@ void metricCamera(const nav_msgs::Odometry::ConstPtr& msg)
   if(cost_function > threshold)
   {
     // std::cout << "Aie aie aie" << std::endl;
-    publish_tf_bool = !publish_tf_bool;
+    // publish_tf_bool = !publish_tf_bool;
+    // test messages
+    camera_is1500::GetPointsFromMetric msg_to_pub;
+    msg_to_pub.x = pos_x;
+    msg_to_pub.y = pos_y;
+    msg_to_pub.z = 0.0;
+    double roll = msg->pose.pose.orientation.x;
+    double pitch = msg->pose.pose.orientation.y;
+    double yaw = msg->pose.pose.orientation.z;
+    double w = msg->pose.pose.orientation.w;
+    yaw = atan2(2.0*((w*yaw+roll*pitch)), 1.0-2.0*(pow(pitch, 2)+pow(yaw,2)));
+    msg_to_pub.yaw = yaw;
+    msg_to_pub.cost = cost_function;
+    msg_to_pub.mapNumber = mapNumber;
+    metric_pub->publish(msg_to_pub);
   }
 }
 
