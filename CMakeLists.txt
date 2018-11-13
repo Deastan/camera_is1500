@@ -22,6 +22,19 @@ find_package(catkin REQUIRED COMPONENTS
   #Eigen REQUIRED
 )
 
+
+add_message_files(
+  FILES
+    GetPointsFromMetric.msg
+#   Message1.msg
+#   Message2.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
+
 ###################################
 ## catkin specific configuration ##
 ###################################
@@ -89,17 +102,6 @@ target_link_libraries(camera_is1500
 #          RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 
-add_message_files(
-  FILES
-    GetPointsFromMetric
-#   Message1.msg
-#   Message2.msg
-)
-
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-)
 
 #############
 ## Install ##

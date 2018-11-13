@@ -14,6 +14,9 @@
 
 // Include
 #include <camera_is1500_node.h>
+
+#include <camera_is1500/GetPointsFromMetric.h>
+
 #include <XmlRpcValue.h>
 #include "ros/console.h"
 #include "ros/static_assert.h"
@@ -75,7 +78,8 @@ int main(int argc, char **argv)
   ros::Publisher odom_track_pub = nh.advertise<nav_msgs::Odometry>("base_link_odom_camera_is1500", 1); //1000 to 1
   ros::Rate loop_rate(frequency);
   ros::Subscriber sub_for_metric = nh.subscribe("base_link_odom_camera_is1500", 1, metricCamera);
-  // Get parameters
+  ros::Publisher metric_pub = nh.advertise<camera_is1500::GetPointsFromMetric>("bim", 10); //1000 to 1
+
   init(nh);
 
   openSfHub();
@@ -90,6 +94,17 @@ int main(int argc, char **argv)
     publish_position(nh, track_pub, odom_track_pub, last_time, br);
     ros::spinOnce();
     loop_rate.sleep();
+
+    // test messages
+    camera_is1500::GetPointsFromMetric msg;
+    msg.x = 1.0;
+    msg.y = 2.0;
+    msg.z = 0.0;
+    msg.yaw = 3.14;
+    msg.cost = 100.0;
+    msg.mapNumber = 0;
+    metric_pub.publish(msg);
+    // Get parameters
   } // end ros-loop
 
   closeSfHub();
