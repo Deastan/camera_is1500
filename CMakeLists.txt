@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf2
   tf2_ros
   tf2_msgs
+  message_generation
   #Eigen3
   #Eigen REQUIRED
 )
@@ -43,6 +44,7 @@ catkin_package(
     std_msgs
     std_srvs
     nav_msgs
+    message_runtime
 #  DEPENDS #Eigen
 )
 
@@ -87,8 +89,17 @@ target_link_libraries(camera_is1500
 #          RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 
+add_message_files(
+  FILES
+    GetPointsFromMetric
+#   Message1.msg
+#   Message2.msg
+)
 
-
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 #############
 ## Install ##
