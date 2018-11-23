@@ -80,7 +80,8 @@ def turning_callback(msg):
     if(True):#ready_to_go == 1 and success == 0): # Success is not used yet...
 
 
-        print("Err_angle : ", err_angle, "Err_x : ", err_x, '\n', "Robot position : (", robot_x, ", ", robot_y, ")")
+        print("Err_angle : ", err_angle, "Err_x : ", err_x, '\n',
+            "Robot position : (", robot_x, ", ", robot_y, ")")
 
         # First change the angle to have the point in front of the robot and
         # after move forward
@@ -98,7 +99,7 @@ def turning_callback(msg):
             mot_msg.angular.z = 0.0
             if(np.abs(err_x) > 0.1): # envi 2.9 deg
                 if(err_x > 0):
-                    mot_msg.linear.x = 0.45
+                    mot_msg.linear.x = 0.6
                     mot_msg.linear.y = 0.0
 
             else:
