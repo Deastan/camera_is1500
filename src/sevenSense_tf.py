@@ -40,43 +40,43 @@ def unit_vector(vector):
 #global mot_pub
 # mot_pub = rospy.Publisher('/cmd_vel', Twist, queue_size = 1) # 100 to 1
 
-rate = 0
-
-def publisher_sevenSense(sevenSense_pub, listener):
-    
-    global rate
-
-    print("Start publish")
-
-    print("Issue: 1")
-    (trans,rot) = listener.lookupTransform('/cam_3_optical_frame', '/imu', rospy.Time(0))
-    print("Issue: 2")
-    msg = Odometry()
-    msg.header.stamp = rospy.Time.now()
-    msg.header.frame_id = "/map"#self.frame_id # i.e. '/odom'
-    msg.child_frame_id = "/base_link"#self.child_frame_id # i.e. '/base_footprint'
-    msg.pose.pose.position = Point(trans[0], trans[1], trans[2])
-    msg.pose.pose.orientation = Quaternion(0.0, 0.0, 0.0, 1.0)
-
-    sevenSense_pub.publish(msg)
-    print("End publish")
-    rate.sleep()
-
-def run():
-    global sevenSense_pub
-    global rate
-    rospy.loginfo("Transfromation starting up")
-    rospy.init_node('Transfromation')
-    sevenSense_pub = rospy.Publisher('/odom_sevenSense', Odometry)
-
-    listener = tf.TransformListener()
-    rate = rospy.Rate(10)
-    # rospy.Subscriber("/base_link_odom_camera_is1500", Odometry, turning_callback)
-    publisher_sevenSense(sevenSense_pub, listener)
-
-
-    # spin() simply keeps python from exiting until this node is stopped
-    rospy.spin()
+# rate = 0
+#
+# def publisher_sevenSense(sevenSense_pub, listener):
+#
+#     global rate
+#
+#     print("Start publish")
+#
+#     print("Issue: 1")
+#     (trans,rot) = listener.lookupTransform('/cam_3_optical_frame', '/imu', rospy.Time(0))
+#     print("Issue: 2")
+#     msg = Odometry()
+#     msg.header.stamp = rospy.Time.now()
+#     msg.header.frame_id = "/map"#self.frame_id # i.e. '/odom'
+#     msg.child_frame_id = "/base_link"#self.child_frame_id # i.e. '/base_footprint'
+#     msg.pose.pose.position = Point(trans[0], trans[1], trans[2])
+#     msg.pose.pose.orientation = Quaternion(0.0, 0.0, 0.0, 1.0)
+#
+#     sevenSense_pub.publish(msg)
+#     print("End publish")
+#     rate.sleep()
+#
+# def run():
+#     global sevenSense_pub
+#     global rate
+#     rospy.loginfo("Transfromation starting up")
+#     rospy.init_node('Transfromation')
+#     sevenSense_pub = rospy.Publisher('/odom_sevenSense', Odometry)
+#
+#     listener = tf.TransformListener()
+#     rate = rospy.Rate(10)
+#     # rospy.Subscriber("/base_link_odom_camera_is1500", Odometry, turning_callback)
+#     publisher_sevenSense(sevenSense_pub, listener)
+#
+#
+#     # spin() simply keeps python from exiting until this node is stopped
+#     rospy.spin()
 
  #def main_loop(self):
 #    while not rospy.is_shutdown():
@@ -86,9 +86,29 @@ def run():
 #   Main
 #*******************************************************************************
 if __name__ == '__main__':
-    try:
-        run()
-    except rospy.ROSInterruptException:
-        pass
+    rospy.init_node('sevensense_tf_listener')
+    print("Start")
+    sevenSense_pub = rospy.Publisher('/odom_sevenSense', Odometry)
+    listener = tf.TransformListener()
+
+    rate = rospy.Rate(10.0)
+    # print("Issue: 1")
+    while not rospy.is_shutdown():
+        try:
+            (trans,rot) = listener.lookupTransform('/base_link', '/map', rospy.Time(0))
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            continue
+        # print(rot)
+        # print("Issue: 2")
+        msg = Odometry()
+        msg.header.stamp = rospy.Time.now()
+        msg.header.frame_id = "/map"#self.frame_id # i.e. '/odom'
+        msg.child_frame_id = "/base_link"#self.child_frame_id # i.e. '/base_footprint'
+        msg.pose.pose.position = Point(trans[0], trans[1], trans[2])
+        msg.pose.pose.orientation = Quaternion(rot[0], rot[1], rot[2], rot[3])
+
+        sevenSense_pub.publish(msg)
+
+        rate.sleep()
 
     print("end")
