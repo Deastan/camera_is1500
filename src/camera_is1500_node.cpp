@@ -71,7 +71,7 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "interface_sfHub_ros");
   ros::start();
   ros::Time last_time;
-  tf2_ros::TransformBroadcaster br;
+  // tf2_ros::TransformBroadcaster br;
 
   // init. publisher
   ros::NodeHandle nh;//if private param can put that after nh like nh("~");
