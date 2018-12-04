@@ -37,7 +37,7 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
         try:
             # Get the lookupTransform to have the transfrom
-            (trans,rot) = listener.lookupTransform('/base_link', '/map', rospy.Time(0))
+            (trans,rot) = listener.lookupTransform('/map', '/base_link', rospy.Time(0))
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             continue
 
