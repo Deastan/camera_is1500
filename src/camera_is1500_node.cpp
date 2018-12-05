@@ -209,9 +209,9 @@ void changeMap(ros::NodeHandle nh, int &numberMap, int &lastMapNumber,
     ROS_INFO("Map is configured");
     std::ifstream  src(tableMapPathsArg[numberMap].c_str(), std::ios::binary);
     std::cout << "Map memory: " << src << ", path is: " << tableMapPathsArg[numberMap] << std::endl;
-    std::ofstream  dst("/home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/S1/environmentPSEs.cfg",   std::ios::binary);
+    std::ofstream  dst("/home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/S1/environmentPSEs.cfg",   std::ios::binary);
     dst << src.rdbuf();
-    system("gnome-terminal -x sh -c 'cd && cd /home/ew/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
+    system("gnome-terminal -x sh -c 'cd && cd /home/jonathan/Documents/wrapperCameraIS-1500/IS-1500_Software/Linux/sfHub/ && ./sfHub'");
     // system("gnome-terminal -x sh -c 'cd && cd && cd catkin_ws_kyb && source devel/setup.bash && roscd camera_is1500/ && cd external_software/sfHub/ && ./sfHub'");
     lastMapNumber = numberMap;
     // return true;
