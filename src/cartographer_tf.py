@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# Interface to get back the position of the robot from sevensSense A.G.
+# Interface to get back the position of the robot from cartographer
 # Jonathan Burkhard, Kyburz 2018
 # Documentations : Not exist yet
 
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     rospy.init_node('cartographer_tf_listener')
 
     # declarate and init. Publisher
-    odom_pub = rospy.Publisher('/odom_cartographer', Odometry)
+    odom_pub = rospy.Publisher('/odom_cartographer', Odometry, queue_size=1)
     # declarate and init tf listener
     listener = tf.TransformListener()
 
@@ -35,13 +35,14 @@ if __name__ == '__main__':
     rate = rospy.Rate(10.0)
     # Loop
     while not rospy.is_shutdown():
-        print("inside while")
+        # print("inside while")
         try:
             # Get the lookupTransform to have the transfrom
-            print("inside try")
-            (trans,rot) = listener.lookupTransform('/odom', '/base_link', rospy.Time(0))
+            # print("inside try")
+            (trans,rot) = listener.lookupTransform('/map', '/base_link', rospy.Time(0))
+            # print("after try")
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-            print("Exception detection")
+            # print("Exception detection")
             continue
 
         # Create an odometry message
@@ -53,7 +54,7 @@ if __name__ == '__main__':
         msg.pose.pose.orientation = Quaternion(rot[0], rot[1], rot[2], rot[3])
 
         # Publish the message
-        print("Publish msg")
+        # print("Publish msg at time:")#, rospy.Time())
         odom_pub.publish(msg)
 
         rate.sleep()
